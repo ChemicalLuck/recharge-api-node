@@ -1,0 +1,59 @@
+{
+  "name": "recharge-api-node",
+  "version": "0.1.0",
+  "description": "ReCharge API Node.js Client",
+  "keywords": [
+    "recharge",
+    "api",
+    "client",
+    "node",
+    "nodejs"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "Joe Tebbett <j.tebbett@outlook.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/ChemicalLuck/recharge-api-node",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ChemicalLuck/recharge-api-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ChemicalLuck/recharge-api-node/issues"
+  },
+  "scripts": {
+    "build": "tsup",
+    "format:all": "prettier --write .",
+    "format:staged": "prettier --write $(git diff --staged --name-only --diff-filter d | xargs)",
+    "prepare": "node .husky/install.mjs"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": {
+        "require": "./dist/index.d.cts",
+        "default": "./dist/index.d.ts"
+      },
+      "default": {
+        "require": "./dist/index.cjs",
+        "import": "./dist/index.js"
+      }
+    }
+  },
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "prettier": "^3.3.2",
+    "tsup": "^8.1.0",
+    "typescript": "^5.5.3"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "node-fetch": "^3.3.2"
+  }
+}
