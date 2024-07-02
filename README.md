@@ -1,4 +1,5 @@
 # Recharge API Client for Node.js
+
 This is a Node.js client for the Recharge API. It is a wrapper around the Recharge API, which is a RESTful API that allows you to interact with your Recharge account programmatically.
 
 [![npm package](https://img.shields.io/badge/npm%20i-@chemicalluck/recharge--api--node-brightgreen)](https://www.npmjs.com/package/chemicalluck/recharge-api-node)
@@ -7,6 +8,7 @@ This is a Node.js client for the Recharge API. It is a wrapper around the Rechar
 [![License](https://img.shields.io/github/license/chemicalluck/recharge-api-node)](https://github.com/chemicalluck/recharge-api-node/blob/main/LICENSE)
 
 ## Installation
+
 To install the Recharge API client, run the following command:
 
 ```bash
@@ -14,11 +16,13 @@ npm install @ChemicalLuck/recharge-api-node
 ```
 
 ## Usage
-To use the Recharge API client, you will need to create a new instance of the `Recharge` class and pass in your Recharge API key. You can then use the methods provided by the client to interact with the Recharge API.
-```typescript
-import { Recharge } from '@ChemicalLuck/recharge-api-node';
 
-const recharge = new Recharge('your-api-key');
+To use the Recharge API client, you will need to create a new instance of the `Recharge` class and pass in your Recharge API key. You can then use the methods provided by the client to interact with the Recharge API.
+
+```typescript
+import { Recharge } from "@ChemicalLuck/recharge-api-node";
+
+const recharge = new Recharge("your-api-key");
 
 const customer_id = 12345;
 const addresses = await recharge.v1.address.list(customer_id);
@@ -29,7 +33,9 @@ console.log(addresses);
 For more details on the content of the reponses, visit the [official recharge API docs](https://developer.rechargepayments.com).
 
 ## Resources Available
+
 ### v1(2021-01)
+
 - [x] Address
 - [ ]Charge
 - [ ]Checkout
@@ -44,7 +50,9 @@ For more details on the content of the reponses, visit the [official recharge AP
 - [ ]Subscription
 - [ ]Webhook
 - [ ]Async Batch
+
 ### v2(2021-11)
+
 - [ ]Address
 - [ ]BundleSelection
 - [ ]Charge
