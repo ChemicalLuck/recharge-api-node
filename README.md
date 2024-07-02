@@ -2,7 +2,7 @@
 This is a Node.js client for the Recharge API. It is a wrapper around the Recharge API, which is a RESTful API that allows you to interact with your Recharge account programmatically.
 
 [![npm package](https://img.shields.io/badge/npm%20i-@chemicalluck/recharge--api--node-brightgreen)](https://www.npmjs.com/package/chemicalluck/recharge-api-node)
-[![version number](https://img.shields.io/npm/v/example-typescript-package?color=green&label=version)](https://github.com/chemicalluck/recharge-api-node/releases)
+[![NPM Version](https://img.shields.io/npm/v/%40chemicalluck%2Frecharge-api-node)](https://github.com/chemicalluck/recharge-api-node/releases)
 [![Release & Publish](https://github.com/ChemicalLuck/recharge-api-node/actions/workflows/publish.yml/badge.svg)](https://github.com/ChemicalLuck/recharge-api-node/actions/workflows/publish.yml)
 [![License](https://img.shields.io/github/license/chemicalluck/recharge-api-node)](https://github.com/chemicalluck/recharge-api-node/blob/main/LICENSE)
 
