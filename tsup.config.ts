@@ -6,7 +6,7 @@ export default defineConfig({
   minify: true,
   dts: true,
   format: ["cjs", "esm"],
-  target: "node14",
+  target: "node18",
   outDir: "dist",
   clean: true
 });
