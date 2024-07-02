@@ -1,4 +1,8 @@
-export { HTTPResponseError, RechargeAPIError } from "./error";
+export {
+  HTTPResponseError,
+  RechargeAPIError,
+  NotImplementedError
+} from "./error";
 
 export { RequestMethod } from "./client";
 

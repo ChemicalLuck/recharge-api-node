@@ -1,54 +1,56 @@
-import RechargeClient from "../../client";
-import { RechargeAPIVersion } from "../../models";
+/* Pending implementation */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import RechargeResource from "../resource";
+import RechargeClient from "../../client";
 
 class AddressResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
     this.resource = "addresses";
-    this.recharge_version = RechargeAPIVersion.v1;
   }
 
-  create(customer_id: number, body: object): Promise<any> {
+  create(customerId: number, body: object): Promise<any> {
     return this.client.post(
-      `${this.base_url}/customers/${customer_id}/${this.resource}`,
+      `${this.base_url}/customers/${customerId}/${this.resource}`,
+      this.recharge_version,
       body
     );
   }
 
-  get(address_id: number): Promise<any> {
-    return this.client.get(`${this.url}/${address_id}`);
+  get(addressId: number): Promise<any> {
+    return this._get(`${this.url}/${addressId}`);
   }
 
-  update(address_id: number, body: object): Promise<any> {
-    return this.client.put(`${this.url}/${address_id}`, body);
+  update(addressId: number, body: object): Promise<any> {
+    return this._put(`${this.url}/${addressId}`, body);
   }
 
-  delete(address_id: number): Promise<any> {
-    return this.client.delete(`${this.url}/${address_id}`);
+  delete(addressId: number): Promise<any> {
+    return this._delete(`${this.url}/${addressId}`);
   }
 
-  list(customer_id: number, query?: Record<string, any>): Promise<any> {
-    return this.client.get(
-      `${this.base_url}/customers/${customer_id}/${this.resource}`,
+  list(customerId: number, query?: Record<string, string>): Promise<any> {
+    return this._get(
+      `${this.base_url}/customers/${customerId}/${this.resource}`,
       query
     );
   }
 
-  count(query?: Record<string, any>): Promise<any> {
-    return this.client.get(`${this.url}/count`, query);
+  count(query?: Record<string, string>): Promise<any> {
+    return this._get(`${this.url}/count`, query);
   }
 
-  validate(body: any): Promise<any> {
-    return this.client.post(`${this.url}/validate`, body);
+  validate(body: unknown): Promise<any> {
+    return this._post(`${this.url}/validate`, body);
   }
 
-  applyDiscount(address_id: number, body: Record<string, any>): Promise<any> {
-    return this.client.post(`${this.url}/${address_id}/apply_discount`, body);
+  applyDiscount(addressId: number, body: unknown): Promise<any> {
+    return this._post(`${this.url}/${addressId}/apply_discount`, body);
   }
 
-  removeDiscount(address_id: number): Promise<any> {
-    return this.client.post(`${this.url}/${address_id}/remove_discount`);
+  removeDiscount(addressId: number): Promise<any> {
+    return this._post(`${this.url}/${addressId}/remove_discount`);
   }
 }
 

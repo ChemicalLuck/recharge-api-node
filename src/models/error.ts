@@ -15,4 +15,10 @@ class RechargeAPIError extends Error {
   }
 }
 
-export { HTTPResponseError, RechargeAPIError };
+class NotImplementedError extends Error {
+  constructor(message: string) {
+    super(`Not Implemented: ${message}`);
+  }
+}
+
+export { HTTPResponseError, RechargeAPIError, NotImplementedError };
