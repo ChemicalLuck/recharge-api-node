@@ -30,8 +30,8 @@ abstract class RechargeResource {
     return this.client.put(url, this.recharge_version, body);
   }
 
-  protected _delete<T>(url: string): Promise<T> {
-    return this.client.delete(url, this.recharge_version);
+  protected _delete<T>(url: string, body?: unknown): Promise<T> {
+    return this.client.delete(url, this.recharge_version, body);
   }
 
   protected _paginate<T>(

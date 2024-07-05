@@ -209,9 +209,18 @@ class RechargeClient {
     return this._extractData<T>(response);
   }
 
-  async delete<T>(url: string, version: RechargeAPIVersion): Promise<T> {
+  async delete<T>(
+    url: string,
+    version: RechargeAPIVersion,
+    json?: unknown
+  ): Promise<T> {
     this._setVersion(version);
-    const response = await this._request(RequestMethod.DELETE, url);
+    const response = await this._request(
+      RequestMethod.DELETE,
+      url,
+      undefined,
+      json
+    );
     return this._extractData<T>(response);
   }
 }
