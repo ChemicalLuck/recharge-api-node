@@ -1,4 +1,4 @@
-import { Response } from "node-fetch";
+import type { Response } from "node-fetch";
 
 class HTTPResponseError extends Error {
   response: Response;

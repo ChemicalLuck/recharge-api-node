@@ -4,6 +4,6 @@ export {
   NotImplementedError
 } from "./error";
 
-export { RequestMethod } from "./client";
-
 export { RechargeAPIVersion } from "./api/version";
+
+export { RequestMethod } from "./request";
