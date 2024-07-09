@@ -1,76 +1,50 @@
-import fetch, { Request, Response } from "node-fetch";
-import { RechargeAPIVersion, RequestMethod } from "./models";
+import fetch, { Request } from "node-fetch";
+import type { RequestInit, Response } from "node-fetch";
 import {
+  RequestMethod,
+  RechargeAPIVersion,
   HTTPResponseError,
   NotImplementedError,
   RechargeAPIError
-} from "./models/error";
+} from "~/models";
 
 class RechargeClient {
-  private _headers: Record<string, string> = {};
+  private _headers: Record<string, string>;
   private _retries = 0;
   private readonly _maxRetries = 3;
   private readonly _retryDelay = 3000;
 
-  constructor(api_key: string) {
-    this.headers = {
-      "X-Recharge-Access-Token": api_key,
+  constructor(apiKey: string) {
+    this._headers = {
+      "X-Recharge-Access-Token": apiKey,
       "X-Recharge-API-Version": RechargeAPIVersion.v1,
       "Content-Type": "application/json"
     };
   }
 
-  get retries() {
-    return this._retries;
-  }
-
-  set retries(value: number) {
-    this._retries = value;
-  }
-
-  get maxRetries() {
-    return this._maxRetries;
-  }
-
-  get retryDelay() {
-    return this._retryDelay;
-  }
-
-  public get headers(): Record<string, string> {
-    return this._headers;
-  }
-  public set headers(value: Record<string, string>) {
-    this._headers = value;
-  }
-
-  _setVersion(value: RechargeAPIVersion) {
-    this.headers["X-Recharge-API-Version"] = value;
+  _setVersion(value: RechargeAPIVersion): void {
+    this._headers["X-Recharge-API-Version"] = value;
   }
 
   private async _retry(request: Request): Promise<Response> {
     if (this._retries >= this._maxRetries) {
-      console.error("Max retries reached");
       throw new RechargeAPIError("Max retries reached");
     }
-
-    this.retries++;
-    console.info(
-      `Retrying: ${this.retries}/${this.maxRetries} retries, waiting ${this.retryDelay}ms...`
-    );
+    this._retries++;
     await this._delay(this._retryDelay);
     return this._send(request);
   }
 
-  private async _delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  private async _delay(ms: number): Promise<void> {
+    return new Promise<void>((resolve) => setTimeout(resolve, ms));
   }
 
   private _constructURL(url: string, query?: Record<string, string>): string {
     const urlWithParams = new URL(url);
     if (query) {
-      Object.keys(query).forEach((key) =>
-        urlWithParams.searchParams.append(key, query[key])
-      );
+      Object.entries(query).forEach(([key, value]) => {
+        urlWithParams.searchParams.append(key, value);
+      });
     }
     return urlWithParams.toString();
   }
@@ -79,13 +53,15 @@ class RechargeClient {
     method: RequestMethod,
     json?: unknown
   ): RequestInit {
+    const body =
+      ["POST", "PUT", "PATCH"].includes(method) && json
+        ? JSON.stringify(json)
+        : null;
+
     return {
       method,
-      headers: this.headers,
-      body:
-        ["POST", "PUT", "PATCH"].includes(method.toUpperCase()) && json
-          ? JSON.stringify(json)
-          : undefined
+      headers: this._headers,
+      body
     };
   }
 
@@ -96,7 +72,7 @@ class RechargeClient {
     json?: unknown
   ): Promise<Response> {
     const urlWithParams = this._constructURL(url, query);
-    const options: RequestInit = this._constructRequestOptions(method, json);
+    const options = this._constructRequestOptions(method, json);
     const request = new Request(urlWithParams, options);
 
     return this._send(request);
@@ -104,22 +80,22 @@ class RechargeClient {
 
   async _send(request: Request): Promise<Response> {
     const response = await fetch(request);
-
-    if (response.status === 429 || response.status >= 500) {
-      console.warn(
-        response.status === 429
-          ? "Rate limited, retrying..."
-          : "Server error, retrying..."
-      );
+    if (this._shouldRetry(response)) {
       return this._retry(request);
     }
-    this.retries = 0;
+    this._retries = 0;
+    this._handleErrors(response);
+    return response;
+  }
 
+  private _shouldRetry(response: Response): boolean {
+    return response.status === 429 || response.status >= 500;
+  }
+
+  private _handleErrors(response: Response): void {
     if (!response.ok) {
       throw new HTTPResponseError(response);
     }
-
-    return response;
   }
 
   async _extractData<T>(response: Response): Promise<T> {
@@ -127,15 +103,11 @@ class RechargeClient {
   }
 
   _getNextPageV1(response: Response): string | undefined {
-    const link = response.headers.get("link") || "";
-    const next_cursor = link.match(/<([^>]+)>; rel="next"/);
-    if (!next_cursor) {
-      return undefined;
-    }
-    return next_cursor[1];
+    const link = response.headers.get("link") ?? "";
+    const nextCursor = link.match(/<([^>]+)>; rel="next"/);
+    return nextCursor ? nextCursor[1] : undefined;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _getNextPageV2(_response: Response): string | undefined {
     throw new NotImplementedError("getNextPageV2");
   }
@@ -163,7 +135,7 @@ class RechargeClient {
       const response = await this._request(RequestMethod.GET, url, query);
       const responseData = await this._extractData<T[]>(response);
       data = data.concat(responseData);
-      url = this._getNextPage(response, version) || "";
+      url = this._getNextPage(response, version) ?? "";
     }
     return data;
   }
@@ -174,9 +146,8 @@ class RechargeClient {
     query?: Record<string, string>
   ): Promise<T> {
     this._setVersion(version);
-    return this._request(RequestMethod.GET, url, query).then(
-      this._extractData<T>
-    );
+    const response = await this._request(RequestMethod.GET, url, query);
+    return this._extractData<T>(response);
   }
 
   async post<T>(
@@ -225,5 +196,4 @@ class RechargeClient {
   }
 }
 
-export { RechargeClient };
 export default RechargeClient;

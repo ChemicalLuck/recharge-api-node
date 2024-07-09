@@ -1,5 +1,5 @@
-import * as v1 from "./api/v1";
-import { RechargeClient } from "./client";
+import * as v1 from "~/api/v1";
+import RechargeClient from "~/client";
 
 class RechargeV1 {
   address: v1.AddressResource;
@@ -41,8 +41,13 @@ class Recharge {
   private client: RechargeClient;
   v1: RechargeV1;
 
-  constructor(api_key: string, client?: RechargeClient) {
-    this.client = client || new RechargeClient(api_key);
+  /**
+   * Constructs a new Recharge instance.
+   * @param api_key - The Recharge API key.
+   * @param client - The Recharge client.
+   */
+  constructor(apiKey: string, client?: RechargeClient) {
+    this.client = client ?? new RechargeClient(apiKey);
     this.v1 = new RechargeV1(this.client);
   }
 }
