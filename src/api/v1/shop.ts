@@ -1,12 +1,20 @@
-import RechargeClient from "../../client";
-import { RechargeAPIVersion } from "../../models";
+import type RechargeClient from "~/client";
+import { RechargeAPIVersion } from "~/models";
 import RechargeResource from "../resource";
 
 class ShopResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
     this.resource = "shop";
-    this.recharge_version = RechargeAPIVersion.v1;
+    this.rechargeVersion = RechargeAPIVersion.v1;
+  }
+
+  get(): Promise<unknown> {
+    return this._get(`${this.url}`);
+  }
+
+  shipping_countries(): Promise<unknown> {
+    return this._get(`${this.url}/shipping_countries`);
   }
 }
 

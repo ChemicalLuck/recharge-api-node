@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import RechargeResource from "../resource";
-import RechargeClient from "../../client";
+import type RechargeClient from "~/client";
 
 class AddressResource extends RechargeResource {
   constructor(client: RechargeClient) {
@@ -11,9 +11,8 @@ class AddressResource extends RechargeResource {
   }
 
   create(customerId: number, body: object): Promise<any> {
-    return this.client.post(
-      `${this.base_url}/customers/${customerId}/${this.resource}`,
-      this.recharge_version,
+    return this._post(
+      `${this.baseUrl}/customers/${customerId}/${this.resource}`,
       body
     );
   }
@@ -31,8 +30,8 @@ class AddressResource extends RechargeResource {
   }
 
   list(customerId: number, query?: Record<string, string>): Promise<any> {
-    return this._get(
-      `${this.base_url}/customers/${customerId}/${this.resource}`,
+    return this._paginate(
+      `${this.baseUrl}/customers/${customerId}/${this.resource}`,
       query
     );
   }

@@ -1,4 +1,4 @@
-import RechargeClient from "../../client";
+import type RechargeClient from "../../client";
 import { RechargeAPIVersion } from "../../models";
 import RechargeResource from "../resource";
 
@@ -6,7 +6,11 @@ class NotificationResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
     this.resource = "notifications";
-    this.recharge_version = RechargeAPIVersion.v1;
+    this.rechargeVersion = RechargeAPIVersion.v1;
+  }
+
+  send(body: object): Promise<unknown> {
+    return this._post(`${this.url}`, body);
   }
 }
 
