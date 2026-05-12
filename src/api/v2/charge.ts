@@ -6,7 +6,7 @@ class ChargeResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
     this.resource = "charges";
-    this.rechargeVersion = RechargeAPIVersion.v1;
+    this.rechargeVersion = RechargeAPIVersion.v2;
   }
 
   get(chargeId: number): Promise<unknown> {
@@ -17,12 +17,12 @@ class ChargeResource extends RechargeResource {
     return this._paginate(`${this.url}`, "charges", query);
   }
 
-  count(query?: Record<string, string>): Promise<unknown> {
-    return this._get(`${this.url}/count`, query);
+  applyDiscount(chargeId: number, body: object): Promise<unknown> {
+    return this._post(`${this.url}/${chargeId}/apply_discount`, body);
   }
 
-  change_next_charge_date(chargeId: number, body: object): Promise<unknown> {
-    return this._post(`${this.url}/${chargeId}/change_next_charge_date`, body);
+  removeDiscount(chargeId: number): Promise<unknown> {
+    return this._post(`${this.url}/${chargeId}/remove_discount`);
   }
 
   skip(chargeId: number, body?: object): Promise<unknown> {
@@ -45,12 +45,12 @@ class ChargeResource extends RechargeResource {
     return this._post(`${this.url}/${chargeId}/capture_payment`);
   }
 
-  apply_discount(chargeId: number, body: object): Promise<unknown> {
-    return this._post(`${this.url}/${chargeId}/apply_discount`, body);
+  addFreeGift(chargeId: number, body: object): Promise<unknown> {
+    return this._post(`${this.url}/${chargeId}/add_free_gift`, body);
   }
 
-  remove_discount(chargeId: number): Promise<unknown> {
-    return this._post(`${this.url}/${chargeId}/remove_discount`);
+  removeFreeGift(chargeId: number, body: object): Promise<unknown> {
+    return this._post(`${this.url}/${chargeId}/remove_free_gift`, body);
   }
 }
 

@@ -4,7 +4,6 @@ import {
   RequestMethod,
   RechargeAPIVersion,
   HTTPResponseError,
-  NotImplementedError,
   RechargeAPIError
 } from "~/models";
 
@@ -54,7 +53,7 @@ class RechargeClient {
     json?: unknown
   ): RequestInit {
     const body =
-      ["POST", "PUT", "PATCH"].includes(method) && json
+      ["POST", "PUT", "PATCH", "DELETE"].includes(method) && json
         ? JSON.stringify(json)
         : null;
 
@@ -102,42 +101,74 @@ class RechargeClient {
     return response.json() as Promise<T>;
   }
 
-  _getNextPageV1(response: Response): string | undefined {
+  private _getNextPageV1(response: Response): string | undefined {
     const link = response.headers.get("link") ?? "";
-    const nextCursor = link.match(/<([^>]+)>; rel="next"/);
-    return nextCursor ? nextCursor[1] : undefined;
+    const match = link.match(/<([^>]+)>; rel="next"/);
+    return match ? match[1] : undefined;
   }
 
-  _getNextPageV2(_response: Response): string | undefined {
-    throw new NotImplementedError("getNextPageV2");
-  }
+  private async _paginateV1<T>(
+    url: string,
+    responseKey: string,
+    query?: Record<string, string>
+  ): Promise<T[]> {
+    let data: T[] = [];
+    let currentUrl: string | undefined = url;
+    let isFirstPage = true;
 
-  _getNextPage(
-    response: Response,
-    version: RechargeAPIVersion
-  ): string | undefined {
-    switch (version) {
-      case RechargeAPIVersion.v1:
-        return this._getNextPageV1(response);
-      case RechargeAPIVersion.v2:
-        return this._getNextPageV2(response);
+    while (currentUrl) {
+      const response = await this._request(
+        RequestMethod.GET,
+        currentUrl,
+        isFirstPage ? query : undefined
+      );
+      const responseData =
+        await this._extractData<Record<string, T[]>>(response);
+      data = data.concat(responseData[responseKey] ?? []);
+      currentUrl = this._getNextPageV1(response);
+      isFirstPage = false;
     }
+    return data;
+  }
+
+  private async _paginateV2<T>(
+    url: string,
+    responseKey: string,
+    query?: Record<string, string>
+  ): Promise<T[]> {
+    let data: T[] = [];
+    let cursor: string | undefined;
+
+    do {
+      const currentQuery: Record<string, string> = cursor
+        ? { ...query, cursor }
+        : { ...query };
+      const response = await this._request(
+        RequestMethod.GET,
+        url,
+        currentQuery
+      );
+      const responseData = await this._extractData<
+        Record<string, T[]> & { next_cursor?: string }
+      >(response);
+      data = data.concat(responseData[responseKey] ?? []);
+      cursor = responseData.next_cursor ?? undefined;
+    } while (cursor);
+
+    return data;
   }
 
   async paginate<T>(
     url: string,
     version: RechargeAPIVersion,
+    responseKey: string,
     query?: Record<string, string>
   ): Promise<T[]> {
     this._setVersion(version);
-    let data: T[] = [];
-    while (url) {
-      const response = await this._request(RequestMethod.GET, url, query);
-      const responseData = await this._extractData<T[]>(response);
-      data = data.concat(responseData);
-      url = this._getNextPage(response, version) ?? "";
+    if (version === RechargeAPIVersion.v2) {
+      return this._paginateV2<T>(url, responseKey, query);
     }
-    return data;
+    return this._paginateV1<T>(url, responseKey, query);
   }
 
   async get<T>(

@@ -6,7 +6,7 @@ class CustomerResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
     this.resource = "customers";
-    this.rechargeVersion = RechargeAPIVersion.v1;
+    this.rechargeVersion = RechargeAPIVersion.v2;
   }
 
   create(body: object): Promise<unknown> {
@@ -29,12 +29,12 @@ class CustomerResource extends RechargeResource {
     return this._paginate(`${this.url}`, "customers", query);
   }
 
-  count(query?: Record<string, string>): Promise<unknown> {
-    return this._get(`${this.url}/count`, query);
+  deliverySchedule(customerId: number): Promise<unknown> {
+    return this._get(`${this.url}/${customerId}/delivery_schedule`);
   }
 
-  payment_sources(customerId: number): Promise<unknown> {
-    return this._get(`${this.url}/${customerId}/payment_sources`);
+  creditSummary(customerId: number): Promise<unknown> {
+    return this._get(`${this.url}/${customerId}/credit_summary`);
   }
 }
 

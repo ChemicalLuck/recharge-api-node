@@ -13,20 +13,20 @@ class CheckoutResource extends RechargeResource {
     return this._post(`${this.url}`, body);
   }
 
-  get(checkoutId: number): Promise<unknown> {
-    return this._get(`${this.url}/${checkoutId}`);
+  get(token: string): Promise<unknown> {
+    return this._get(`${this.url}/${token}`);
   }
 
-  update(checkoutId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${checkoutId}`, body);
+  update(token: string, body: object): Promise<unknown> {
+    return this._put(`${this.url}/${token}`, body);
   }
 
-  get_shipping_rates(checkoutId: number): Promise<unknown> {
-    return this._get(`${this.url}/${checkoutId}/shipping_rates`);
+  get_shipping_rates(token: string): Promise<unknown> {
+    return this._get(`${this.url}/${token}/shipping_rates`);
   }
 
-  process(checkoutId: number): Promise<unknown> {
-    return this._post(`${this.url}/${checkoutId}/process`);
+  process(token: string, body?: object): Promise<unknown> {
+    return this._post(`${this.url}/${token}/charge`, body);
   }
 }
 

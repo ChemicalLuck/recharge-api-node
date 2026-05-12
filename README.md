@@ -1,6 +1,6 @@
 # Recharge API Client for Node.js
 
-This is a Node.js client for the Recharge API. It is a wrapper around the Recharge API, which is a RESTful API that allows you to interact with your Recharge account programmatically.
+A Node.js client for the Recharge Payments API covering both the 2021-01 and 2021-11 API versions.
 
 [![npm package](https://img.shields.io/badge/npm%20i-@chemicalluck/recharge--api--node-brightgreen)](https://www.npmjs.com/package/chemicalluck/recharge-api-node)
 [![NPM Version](https://img.shields.io/npm/v/%40chemicalluck%2Frecharge-api-node)](https://github.com/chemicalluck/recharge-api-node/releases)
@@ -9,78 +9,80 @@ This is a Node.js client for the Recharge API. It is a wrapper around the Rechar
 
 ## Installation
 
-To install the Recharge API client, run the following command:
-
 ```bash
 npm install @ChemicalLuck/recharge-api-node
 ```
 
 ## Usage
 
-To use the Recharge API client, you will need to create a new instance of the `Recharge` class and pass in your Recharge API key. You can then use the methods provided by the client to interact with the Recharge API.
-
 ```typescript
 import { Recharge } from "@ChemicalLuck/recharge-api-node";
 
 const recharge = new Recharge("your-api-key");
 
-const customer_id = 12345;
-const addresses = await recharge.v1.address.list(customer_id);
+// v1 (2021-01) API
+const addresses = await recharge.v1.address.list(customerId);
+const customer = await recharge.v1.customer.get(customerId);
 
-console.log(addresses);
+// v2 (2021-11) API
+const subscriptions = await recharge.v2.subscription.list();
+const paymentMethods = await recharge.v2.paymentMethod.list();
 ```
 
-For more details on the content of the reponses, visit the [official recharge API docs](https://developer.rechargepayments.com).
+## Resources
 
-## Resources Available
+### v1 (2021-01)
 
-### v1(2021-01)
+| Resource       | Methods                                                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `address`      | `create`, `get`, `update`, `delete`, `list`, `count`, `validate`, `applyDiscount`                                                                             |
+| `asyncBatch`   | `create`, `get`, `list`, `process`, `createTask`, `listTasks`                                                                                                 |
+| `charge`       | `get`, `list`, `count`, `change_next_charge_date`, `skip`, `unskip`, `refund`, `process`, `capture`, `apply_discount`, `remove_discount`                      |
+| `checkout`     | `create`, `get`, `update`, `get_shipping_rates`, `process`                                                                                                    |
+| `customer`     | `create`, `get`, `update`, `delete`, `list`, `count`, `payment_sources`                                                                                       |
+| `discount`     | `create`, `get`, `update`, `delete`, `list`, `count`, `applyToAddress`, `applyToCharge`, `remove`                                                             |
+| `metafield`    | `create`, `get`, `update`, `delete`, `list`, `count`                                                                                                          |
+| `notification` | `send`                                                                                                                                                        |
+| `onetime`      | `create`, `get`, `update`, `delete`, `list`                                                                                                                   |
+| `order`        | `get`, `update`, `delete`, `list`, `count`, `change_date`, `change_variant`, `clone`, `delay`                                                                 |
+| `product`      | `create`, `get`, `update`, `delete`, `list`, `count`                                                                                                          |
+| `shop`         | `get`, `shipping_countries`                                                                                                                                   |
+| `subscription` | `create`, `get`, `update`, `delete`, `list`, `count`, `changeNextChargeDate`, `changeAddress`, `cancel`, `activate`, `bulkCreate`, `bulkUpdate`, `bulkDelete` |
+| `token`        | `token_information`                                                                                                                                           |
+| `webhook`      | `create`, `get`, `update`, `delete`, `list`, `test`                                                                                                           |
 
-- [x] Address
-- [ ]Charge
-- [ ]Checkout
-- [ ]Customer
-- [ ]Discount
-- [ ]Metafield
-- [ ]Notification
-- [ ]Onetime
-- [ ]Order
-- [ ]Product
-- [ ]Shop
-- [ ]Subscription
-- [ ]Webhook
-- [ ]Async Batch
+### v2 (2021-11)
 
-### v2(2021-11)
+| Resource          | Methods                                                                                                                             |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `account`         | `get`, `list`                                                                                                                       |
+| `address`         | `create`, `get`, `update`, `delete`, `list`, `merge`, `skipFutureCharge`                                                            |
+| `asyncBatch`      | `create`, `get`, `list`, `process`, `createTask`, `listTasks`                                                                       |
+| `bundleSelection` | `create`, `get`, `update`, `delete`, `list`                                                                                         |
+| `charge`          | `get`, `list`, `applyDiscount`, `removeDiscount`, `skip`, `unskip`, `refund`, `process`, `capture`, `addFreeGift`, `removeFreeGift` |
+| `checkout`        | `create`, `get`, `update`, `getShippingRates`, `process`                                                                            |
+| `collection`      | `create`, `get`, `update`, `delete`, `list`, `listProducts`, `addProducts`, `removeProducts`                                        |
+| `credit`          | `create`, `get`, `update`, `list`, `createAdjustment`, `listAdjustments`, `listAllAdjustments`                                      |
+| `customer`        | `create`, `get`, `update`, `delete`, `list`, `deliverySchedule`, `creditSummary`                                                    |
+| `discount`        | `create`, `get`, `update`, `delete`, `list`                                                                                         |
+| `event`           | `list`                                                                                                                              |
+| `metafield`       | `create`, `get`, `update`, `delete`, `list`                                                                                         |
+| `notification`    | `sendEmail`                                                                                                                         |
+| `onetime`         | `create`, `get`, `update`, `delete`, `list`                                                                                         |
+| `order`           | `get`, `update`, `delete`, `list`, `clone`, `delay`                                                                                 |
+| `paymentMethod`   | `create`, `get`, `update`, `delete`, `list`                                                                                         |
+| `plan`            | `create`, `update`, `delete`, `list`, `bulkCreate`, `bulkUpdate`, `bulkDelete`                                                      |
+| `product`         | `create`, `get`, `update`, `delete`, `list`                                                                                         |
+| `store`           | `get`                                                                                                                               |
+| `subscription`    | `create`, `get`, `update`, `delete`, `list`, `setNextChargeDate`, `changeAddress`, `cancel`, `activate`                             |
+| `token`           | `get`                                                                                                                               |
+| `webhook`         | `create`, `get`, `update`, `delete`, `list`, `test`                                                                                 |
 
-- [ ]Address
-- [ ]BundleSelection
-- [ ]Charge
-- [ ]Checkout
-- [ ]Collection
-- [ ]Customer
-- [ ]Discount
-- [ ]Metafield
-- [ ]Notification
-- [ ]Onetime
-- [ ]Order
-- [ ]Payment Method
-- [ ]Plan
-- [ ]Retention Strategy
-- [ ]Subscription
-- [ ]Webhook
-- [ ]Async Batch
-- [ ]Token
-- [ ]Account
-- [ ]Event
-- [ ]Store
-
-# Recharge Documentation
+## Recharge Documentation
 
 - [Recharge API 2021-01](https://developer.rechargepayments.com/2021-01/)
 - [Recharge API 2021-11](https://developer.rechargepayments.com/2021-11/)
-- [Recharge API Webhook Examples 2021-01](https://docs.getrecharge.com/docs/webhook-payload-examples)
-- [Recharge API Webhook Examples 2021-11](https://docs.getrecharge.com/docs/webhooks-examples-2021-11)
+- [Recharge Storefront Client Types](https://storefront.getrecharge.com/client/docs/types/)
 
 ## License
 

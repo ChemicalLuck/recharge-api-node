@@ -6,7 +6,7 @@ class OnetimeResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
     this.resource = "onetimes";
-    this.rechargeVersion = RechargeAPIVersion.v1;
+    this.rechargeVersion = RechargeAPIVersion.v2;
   }
 
   create(body: object): Promise<unknown> {

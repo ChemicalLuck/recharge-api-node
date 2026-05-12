@@ -5,8 +5,8 @@ import RechargeResource from "../resource";
 class AsyncBatchResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
-    this.resource = "async_batches";
-    this.rechargeVersion = RechargeAPIVersion.v1;
+    this.resource = "batch";
+    this.rechargeVersion = RechargeAPIVersion.v2;
   }
 
   create(body: object): Promise<unknown> {
@@ -18,7 +18,7 @@ class AsyncBatchResource extends RechargeResource {
   }
 
   list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "async_batches", query);
+    return this._paginate(`${this.url}`, "batches", query);
   }
 
   process(batchId: number): Promise<unknown> {

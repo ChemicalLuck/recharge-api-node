@@ -6,11 +6,11 @@ class NotificationResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
     this.resource = "notifications";
-    this.rechargeVersion = RechargeAPIVersion.v1;
+    this.rechargeVersion = RechargeAPIVersion.v2;
   }
 
-  send(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  sendEmail(body: object): Promise<unknown> {
+    return this._post(`${this.url}/send_email`, body);
   }
 }
 

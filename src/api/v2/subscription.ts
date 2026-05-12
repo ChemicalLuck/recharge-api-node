@@ -6,7 +6,7 @@ class SubscriptionResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
     this.resource = "subscriptions";
-    this.rechargeVersion = RechargeAPIVersion.v1;
+    this.rechargeVersion = RechargeAPIVersion.v2;
   }
 
   create(body: object): Promise<unknown> {
@@ -29,13 +29,9 @@ class SubscriptionResource extends RechargeResource {
     return this._paginate(`${this.url}`, "subscriptions", query);
   }
 
-  count(query?: Record<string, string>): Promise<unknown> {
-    return this._get(`${this.url}/count`, query);
-  }
-
-  changeNextChargeDate(subscriptionId: number, body: object): Promise<unknown> {
+  setNextChargeDate(subscriptionId: number, body: object): Promise<unknown> {
     return this._post(
-      `${this.url}/${subscriptionId}/change_next_charge_date`,
+      `${this.url}/${subscriptionId}/set_next_charge_date`,
       body
     );
   }
@@ -50,18 +46,6 @@ class SubscriptionResource extends RechargeResource {
 
   activate(subscriptionId: number): Promise<unknown> {
     return this._post(`${this.url}/${subscriptionId}/activate`);
-  }
-
-  bulkCreate(body: object): Promise<unknown> {
-    return this._post(`${this.url}/bulk_create`, body);
-  }
-
-  bulkUpdate(body: object): Promise<unknown> {
-    return this._put(`${this.url}/bulk_update`, body);
-  }
-
-  bulkDelete(body: object): Promise<unknown> {
-    return this._delete(`${this.url}/bulk_delete`, body);
   }
 }
 

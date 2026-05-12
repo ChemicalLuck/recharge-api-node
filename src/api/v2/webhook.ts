@@ -6,7 +6,7 @@ class WebhookResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
     this.resource = "webhooks";
-    this.rechargeVersion = RechargeAPIVersion.v1;
+    this.rechargeVersion = RechargeAPIVersion.v2;
   }
 
   create(body: object): Promise<unknown> {
@@ -29,8 +29,8 @@ class WebhookResource extends RechargeResource {
     return this._paginate(this.url, "webhooks", query);
   }
 
-  test(body?: object): Promise<unknown> {
-    return this._post(`${this.url}/test`, body);
+  test(webhookId: number, body?: object): Promise<unknown> {
+    return this._post(`${this.url}/${webhookId}/test`, body);
   }
 }
 

@@ -6,7 +6,7 @@ class DiscountResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
     this.resource = "discounts";
-    this.rechargeVersion = RechargeAPIVersion.v1;
+    this.rechargeVersion = RechargeAPIVersion.v2;
   }
 
   create(body: object): Promise<unknown> {
@@ -27,22 +27,6 @@ class DiscountResource extends RechargeResource {
 
   list(query?: Record<string, string>): Promise<unknown> {
     return this._paginate(`${this.url}`, "discounts", query);
-  }
-
-  count(query?: Record<string, string>): Promise<unknown> {
-    return this._get(`${this.url}/count`, query);
-  }
-
-  applyToAddress(addressId: number, body: object): Promise<unknown> {
-    return this._post(`${this.baseUrl}/addresses/${addressId}/discounts`, body);
-  }
-
-  applyToCharge(chargeId: number, body: object): Promise<unknown> {
-    return this._post(`${this.baseUrl}/charges/${chargeId}/discounts`, body);
-  }
-
-  remove(discountId: number): Promise<unknown> {
-    return this._post(`${this.url}/${discountId}/remove`);
   }
 }
 

@@ -6,7 +6,7 @@ class MetafieldResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
     this.resource = "metafields";
-    this.rechargeVersion = RechargeAPIVersion.v1;
+    this.rechargeVersion = RechargeAPIVersion.v2;
   }
 
   create(body: object): Promise<unknown> {
@@ -27,10 +27,6 @@ class MetafieldResource extends RechargeResource {
 
   list(query?: Record<string, string>): Promise<unknown> {
     return this._paginate(`${this.url}`, "metafields", query);
-  }
-
-  count(query?: Record<string, string>): Promise<unknown> {
-    return this._get(`${this.url}/count`, query);
   }
 }
 

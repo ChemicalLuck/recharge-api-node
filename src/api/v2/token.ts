@@ -1,0 +1,17 @@
+import type RechargeClient from "~/client";
+import { RechargeAPIVersion } from "~/models";
+import RechargeResource from "../resource";
+
+class TokenResource extends RechargeResource {
+  constructor(client: RechargeClient) {
+    super(client);
+    this.resource = "token_info";
+    this.rechargeVersion = RechargeAPIVersion.v2;
+  }
+
+  get(): Promise<unknown> {
+    return this._get(this.url);
+  }
+}
+
+export { TokenResource };

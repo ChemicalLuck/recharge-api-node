@@ -6,7 +6,7 @@ class OrderResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
     this.resource = "orders";
-    this.rechargeVersion = RechargeAPIVersion.v1;
+    this.rechargeVersion = RechargeAPIVersion.v2;
   }
 
   get(orderId: number): Promise<unknown> {
@@ -25,24 +25,12 @@ class OrderResource extends RechargeResource {
     return this._paginate(`${this.url}`, "orders", query);
   }
 
-  count(query?: Record<string, string>): Promise<unknown> {
-    return this._get(`${this.url}/count`, query);
-  }
-
-  change_date(orderId: number, body: object): Promise<unknown> {
-    return this._post(`${this.url}/${orderId}/change_date`, body);
-  }
-
-  change_variant(orderId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${orderId}/change_variant`, body);
-  }
-
   clone(orderId: number, body?: object): Promise<unknown> {
     return this._post(`${this.url}/${orderId}/clone`, body);
   }
 
-  delay(orderId: number): Promise<unknown> {
-    return this._post(`${this.url}/${orderId}/delay`);
+  delay(orderId: number, body?: object): Promise<unknown> {
+    return this._post(`${this.url}/${orderId}/delay`, body);
   }
 }
 

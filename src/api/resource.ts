@@ -15,7 +15,7 @@ abstract class RechargeResource {
     if (!this.resource) {
       throw new Error("Resource not set");
     }
-    return `${this.baseUrl}/${this.rechargeVersion}/${this.resource}`;
+    return `${this.baseUrl}/${this.resource}`;
   }
 
   protected _get<T>(url: string, query?: Record<string, string>): Promise<T> {
@@ -36,9 +36,10 @@ abstract class RechargeResource {
 
   protected _paginate<T>(
     url: string,
+    responseKey: string,
     query?: Record<string, string>
   ): Promise<T[]> {
-    return this.client.paginate(url, this.rechargeVersion, query);
+    return this.client.paginate(url, this.rechargeVersion, responseKey, query);
   }
 }
 
