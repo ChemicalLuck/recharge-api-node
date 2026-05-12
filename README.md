@@ -10,7 +10,7 @@ A Node.js client for the Recharge Payments API covering both the 2021-01 and 202
 ## Installation
 
 ```bash
-npm install @ChemicalLuck/recharge-api-node
+npm install @chemicalLuck/recharge-api-node
 ```
 
 ## Usage
