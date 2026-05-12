@@ -1,6 +1,6 @@
 {
   "name": "@chemicalluck/recharge-api-node",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "ReCharge API Node.js Client",
   "keywords": [
     "recharge",
