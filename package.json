@@ -17,7 +17,7 @@
   "homepage": "https://github.com/ChemicalLuck/recharge-api-node",
   "repository": {
     "type": "git",
-    "url": "git@github.com:ChemicalLuck/recharge-api-node.git"
+    "url": "git+ssh://git@github.com/ChemicalLuck/recharge-api-node.git"
   },
   "bugs": {
     "url": "https://github.com/ChemicalLuck/recharge-api-node/issues"
