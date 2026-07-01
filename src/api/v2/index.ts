@@ -8,6 +8,7 @@ export { CollectionResource } from "./collection";
 export { CreditResource } from "./credit";
 export { CustomerResource } from "./customer";
 export { DiscountResource } from "./discount";
+export { EntitlementResource } from "./entitlement";
 export { EventResource } from "./event";
 export { MetafieldResource } from "./metafield";
 export { NotificationResource } from "./notification";

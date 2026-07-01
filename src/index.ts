@@ -49,6 +49,7 @@ class RechargeV2 {
   credit: v2.CreditResource;
   customer: v2.CustomerResource;
   discount: v2.DiscountResource;
+  entitlement: v2.EntitlementResource;
   event: v2.EventResource;
   metafield: v2.MetafieldResource;
   notification: v2.NotificationResource;
@@ -73,6 +74,7 @@ class RechargeV2 {
     this.credit = new v2.CreditResource(client);
     this.customer = new v2.CustomerResource(client);
     this.discount = new v2.DiscountResource(client);
+    this.entitlement = new v2.EntitlementResource(client);
     this.event = new v2.EventResource(client);
     this.metafield = new v2.MetafieldResource(client);
     this.notification = new v2.NotificationResource(client);

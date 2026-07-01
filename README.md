@@ -29,6 +29,28 @@ const subscriptions = await recharge.v2.subscription.list();
 const paymentMethods = await recharge.v2.paymentMethod.list();
 ```
 
+### Error handling
+
+Non-2xx responses throw an `HTTPResponseError` that exposes the status code and the
+parsed error body returned by Recharge:
+
+```typescript
+import { Recharge, HTTPResponseError } from "@ChemicalLuck/recharge-api-node";
+
+try {
+  await recharge.v2.customer.get(123);
+} catch (error) {
+  if (error instanceof HTTPResponseError) {
+    console.error(error.status); // e.g. 422
+    console.error(error.body); // parsed JSON error payload from Recharge
+  }
+}
+```
+
+Requests are automatically retried (up to 3 times) on `429` and `5xx` responses,
+honouring the `Retry-After` header when present. `list` methods transparently follow
+pagination (Link headers for 2021-01, cursors for 2021-11) and return the full result set.
+
 ## Resources
 
 ### v1 (2021-01)
@@ -65,6 +87,7 @@ const paymentMethods = await recharge.v2.paymentMethod.list();
 | `credit`          | `create`, `get`, `update`, `list`, `createAdjustment`, `listAdjustments`, `listAllAdjustments`                                      |
 | `customer`        | `create`, `get`, `update`, `delete`, `list`, `deliverySchedule`, `creditSummary`                                                    |
 | `discount`        | `create`, `get`, `update`, `delete`, `list`                                                                                         |
+| `entitlement`     | `create`, `update`, `delete`, `list`                                                                                                |
 | `event`           | `list`                                                                                                                              |
 | `metafield`       | `create`, `get`, `update`, `delete`, `list`                                                                                         |
 | `notification`    | `sendEmail`                                                                                                                         |
@@ -74,7 +97,7 @@ const paymentMethods = await recharge.v2.paymentMethod.list();
 | `plan`            | `create`, `update`, `delete`, `list`, `bulkCreate`, `bulkUpdate`, `bulkDelete`                                                      |
 | `product`         | `create`, `get`, `update`, `delete`, `list`                                                                                         |
 | `store`           | `get`                                                                                                                               |
-| `subscription`    | `create`, `get`, `update`, `delete`, `list`, `setNextChargeDate`, `changeAddress`, `cancel`, `activate`                             |
+| `subscription`    | `create`, `get`, `update`, `delete`, `list`, `setNextChargeDate`, `changeAddress`, `cancel`, `activate`, `gift`                     |
 | `token`           | `get`                                                                                                                               |
 | `webhook`         | `create`, `get`, `update`, `delete`, `list`, `test`                                                                                 |
 

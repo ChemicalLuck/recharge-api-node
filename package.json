@@ -1,6 +1,6 @@
 {
   "name": "@chemicalluck/recharge-api-node",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "ReCharge API Node.js Client",
   "keywords": [
     "recharge",
@@ -24,10 +24,15 @@
   },
   "scripts": {
     "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "format:all": "prettier --write .",
     "format:staged": "prettier --write $(git diff --staged --name-only --diff-filter d | xargs)",
     "lint": "eslint src",
     "prepare": "node .husky/install.mjs"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "type": "module",
   "main": "dist/index.js",
@@ -56,7 +61,8 @@
     "prettier": "^3.3.2",
     "tsup": "^8.1.0",
     "typescript": "^5.5.3",
-    "typescript-eslint": "^7.15.0"
+    "typescript-eslint": "^7.15.0",
+    "vitest": "^4.1.9"
   },
   "dependencies": {
     "node-fetch": "^3.3.2"

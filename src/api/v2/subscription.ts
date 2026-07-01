@@ -47,6 +47,10 @@ class SubscriptionResource extends RechargeResource {
   activate(subscriptionId: number): Promise<unknown> {
     return this._post(`${this.url}/${subscriptionId}/activate`);
   }
+
+  gift(subscriptionId: number, body: object): Promise<unknown> {
+    return this._post(`${this.url}/${subscriptionId}/gift`, body);
+  }
 }
 
 export { SubscriptionResource };

@@ -10,7 +10,7 @@ class NotificationResource extends RechargeResource {
   }
 
   sendEmail(body: object): Promise<unknown> {
-    return this._post(`${this.url}/send_email`, body);
+    return this._post(`${this.url}`, body);
   }
 }
 

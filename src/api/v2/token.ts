@@ -5,7 +5,7 @@ import RechargeResource from "../resource";
 class TokenResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
-    this.resource = "token_info";
+    this.resource = "token_information";
     this.rechargeVersion = RechargeAPIVersion.v2;
   }
 
