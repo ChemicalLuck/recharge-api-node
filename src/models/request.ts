@@ -1,3 +1,4 @@
+/** HTTP methods used by the client. */
 const RequestMethod = {
   GET: "GET",
   POST: "POST",

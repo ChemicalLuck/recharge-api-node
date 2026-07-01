@@ -2,6 +2,11 @@ import * as v1 from "~/api/v1";
 import * as v2 from "~/api/v2";
 import RechargeClient from "~/client";
 
+/**
+ * Namespace of resources for the Recharge 2021-01 (v1) API.
+ *
+ * Accessed via `recharge.v1`.
+ */
 class RechargeV1 {
   address: v1.AddressResource;
   asyncBatch: v1.AsyncBatchResource;
@@ -38,6 +43,11 @@ class RechargeV1 {
   }
 }
 
+/**
+ * Namespace of resources for the Recharge 2021-11 (v2) API.
+ *
+ * Accessed via `recharge.v2`.
+ */
 class RechargeV2 {
   account: v2.AccountResource;
   address: v2.AddressResource;
@@ -90,11 +100,31 @@ class RechargeV2 {
   }
 }
 
+/**
+ * Entry point for the Recharge API client.
+ *
+ * Exposes both API versions via {@link Recharge.v1} (2021-01) and
+ * {@link Recharge.v2} (2021-11), which share a single underlying HTTP client.
+ *
+ * @example
+ * ```typescript
+ * import { Recharge } from "@chemicalluck/recharge-api-node";
+ *
+ * const recharge = new Recharge("your-api-key");
+ * const subscriptions = await recharge.v2.subscription.list();
+ * ```
+ */
 class Recharge {
   private client: RechargeClient;
+  /** Resources for the 2021-01 API version. */
   v1: RechargeV1;
+  /** Resources for the 2021-11 API version. */
   v2: RechargeV2;
 
+  /**
+   * @param apiKey - The Recharge store API token.
+   * @param client - Optional pre-configured client (mainly for testing).
+   */
   constructor(apiKey: string, client?: RechargeClient) {
     this.client = client ?? new RechargeClient(apiKey);
     this.v1 = new RechargeV1(this.client);

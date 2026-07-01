@@ -1,6 +1,6 @@
 {
   "name": "@chemicalluck/recharge-api-node",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "ReCharge API Node.js Client",
   "keywords": [
     "recharge",
@@ -53,18 +53,15 @@
     "dist"
   ],
   "devDependencies": {
-    "@eslint/js": "^9.6.0",
-    "@types/eslint__js": "^8.42.3",
+    "@eslint/js": "^9.37.0",
     "@types/node": "^20.14.10",
-    "eslint": "^8.57.0",
+    "eslint": "^9.37.0",
+    "globals": "^15.15.0",
     "husky": "^9.0.11",
     "prettier": "^3.3.2",
     "tsup": "^8.1.0",
     "typescript": "^5.5.3",
-    "typescript-eslint": "^7.15.0",
+    "typescript-eslint": "^8.46.0",
     "vitest": "^4.1.9"
-  },
-  "dependencies": {
-    "node-fetch": "^3.3.2"
   }
 }

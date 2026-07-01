@@ -1,30 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-
-// node-fetch is mocked so we can observe outgoing requests and script responses.
-vi.mock("node-fetch", () => {
-  class MockRequest {
-    url: string;
-    method?: string;
-    headers?: Record<string, string>;
-    body?: string | null;
-    constructor(
-      url: string,
-      init: {
-        method?: string;
-        headers?: Record<string, string>;
-        body?: string | null;
-      } = {}
-    ) {
-      this.url = url;
-      this.method = init.method;
-      this.headers = init.headers;
-      this.body = init.body ?? null;
-    }
-  }
-  return { default: vi.fn(), Request: MockRequest };
-});
-
-import fetch from "node-fetch";
 import RechargeClient from "~/client";
 import {
   RechargeAPIVersion,
@@ -32,42 +6,34 @@ import {
   RechargeAPIError
 } from "~/models";
 
-const mockedFetch = vi.mocked(fetch);
-
-interface CapturedRequest {
-  url: string;
-  method?: string;
-  headers?: Record<string, string>;
-  body?: string | null;
-}
+// The global `fetch` (Node 20+) is stubbed so we can observe outgoing requests
+// and script responses. Real `Request`/`Response` globals are used throughout.
+const mockedFetch = vi.fn<typeof fetch>();
 
 function fakeResponse(init: {
   status?: number;
   body?: unknown;
   headers?: Record<string, string>;
-}): never {
+}): Response {
   const { status = 200, body, headers = {} } = init;
-  const normalized: Record<string, string> = {};
-  for (const [k, v] of Object.entries(headers)) {
-    normalized[k.toLowerCase()] = v;
-  }
   const text =
     body === undefined
       ? ""
       : typeof body === "string"
         ? body
         : JSON.stringify(body);
-  return {
-    status,
-    statusText: "",
-    ok: status >= 200 && status < 300,
-    headers: { get: (k: string) => normalized[k.toLowerCase()] ?? null },
-    text: () => Promise.resolve(text)
-  } as never;
+  // 204/205/304 responses may not carry a body.
+  const bodyInit =
+    status === 204 || status === 205 || status === 304 ? null : text;
+  return new Response(bodyInit, { status, headers });
 }
 
-function requests(): CapturedRequest[] {
-  return mockedFetch.mock.calls.map((c) => c[0] as unknown as CapturedRequest);
+function requests(): Request[] {
+  return mockedFetch.mock.calls.map((c) => c[0] as Request);
+}
+
+function bodyOf(req: Request): Promise<string> {
+  return req.text();
 }
 
 const URL_BASE = "https://api.rechargeapps.com";
@@ -76,11 +42,13 @@ let client: RechargeClient;
 
 beforeEach(() => {
   mockedFetch.mockReset();
+  vi.stubGlobal("fetch", mockedFetch);
   client = new RechargeClient("test-token");
 });
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllGlobals();
 });
 
 describe("headers", () => {
@@ -89,15 +57,15 @@ describe("headers", () => {
     await client.get(`${URL_BASE}/subscriptions`, RechargeAPIVersion.v2);
 
     const [req] = requests();
-    expect(req.headers?.["X-Recharge-Version"]).toBe("2021-11");
-    expect(req.headers).not.toHaveProperty("X-Recharge-API-Version");
-    expect(req.headers?.["X-Recharge-Access-Token"]).toBe("test-token");
+    expect(req.headers.get("X-Recharge-Version")).toBe("2021-11");
+    expect(req.headers.has("X-Recharge-API-Version")).toBe(false);
+    expect(req.headers.get("X-Recharge-Access-Token")).toBe("test-token");
   });
 
   it("sends the correct version header for v1", async () => {
     mockedFetch.mockResolvedValue(fakeResponse({ body: {} }));
     await client.get(`${URL_BASE}/addresses`, RechargeAPIVersion.v1);
-    expect(requests()[0].headers?.["X-Recharge-Version"]).toBe("2021-01");
+    expect(requests()[0].headers.get("X-Recharge-Version")).toBe("2021-01");
   });
 });
 
@@ -105,7 +73,7 @@ describe("request body", () => {
   it("does not send a body on GET", async () => {
     mockedFetch.mockResolvedValue(fakeResponse({ body: {} }));
     await client.get(`${URL_BASE}/subscriptions`, RechargeAPIVersion.v2);
-    expect(requests()[0].body).toBeNull();
+    expect(await bodyOf(requests()[0])).toBe("");
   });
 
   it("serializes the body on POST", async () => {
@@ -113,7 +81,7 @@ describe("request body", () => {
     await client.post(`${URL_BASE}/subscriptions`, RechargeAPIVersion.v2, {
       a: 1
     });
-    expect(requests()[0].body).toBe(JSON.stringify({ a: 1 }));
+    expect(await bodyOf(requests()[0])).toBe(JSON.stringify({ a: 1 }));
   });
 
   it("sends a body on DELETE when provided (e.g. collections.removeProducts)", async () => {
@@ -125,7 +93,7 @@ describe("request body", () => {
     );
     const [req] = requests();
     expect(req.method).toBe("DELETE");
-    expect(req.body).toBe(JSON.stringify({ product_ids: [1, 2] }));
+    expect(await bodyOf(req)).toBe(JSON.stringify({ product_ids: [1, 2] }));
   });
 });
 
@@ -206,8 +174,8 @@ describe("retries", () => {
 
     const captured = requests();
     expect(captured).toHaveLength(2);
-    expect(captured[0].body).toBe(JSON.stringify(payload));
-    expect(captured[1].body).toBe(JSON.stringify(payload));
+    expect(await bodyOf(captured[0])).toBe(JSON.stringify(payload));
+    expect(await bodyOf(captured[1])).toBe(JSON.stringify(payload));
   });
 
   it("throws after exhausting max retries", async () => {

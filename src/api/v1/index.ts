@@ -1,3 +1,6 @@
+/**
+ * Barrel module re-exporting the Recharge 2021-01 (v1) API resource classes.
+ */
 export { AddressResource } from "./address";
 export { ChargeResource } from "./charge";
 export { CheckoutResource } from "./checkout";

@@ -2,6 +2,11 @@ import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
 import RechargeResource from "../resource";
 
+/**
+ * Retrieve API token information on the Recharge 2021-01 API.
+ *
+ * @see https://developer.rechargepayments.com/2021-01/token_information
+ */
 class TokenResource extends RechargeResource {
   constructor(client: RechargeClient) {
     super(client);
@@ -9,6 +14,13 @@ class TokenResource extends RechargeResource {
     this.rechargeVersion = RechargeAPIVersion.v1;
   }
 
+  /**
+   * Retrieve information about the current API token.
+   *
+   * `GET /token_information`
+   *
+   * @returns The token information record.
+   */
   token_information(): Promise<unknown> {
     return this._get(this.url);
   }

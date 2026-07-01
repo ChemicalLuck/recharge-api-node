@@ -1,3 +1,8 @@
+/**
+ * Barrel module re-exporting the Recharge 2021-11 (v2) resource classes.
+ *
+ * @see https://developer.rechargepayments.com/2021-11
+ */
 export { AccountResource } from "./account";
 export { AddressResource } from "./address";
 export { AsyncBatchResource } from "./async-batch";

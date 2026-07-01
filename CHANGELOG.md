@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented in this file.
 
+## 1.2.0
+
+### Changed
+
+- **Dropped the `node-fetch` dependency** — the client now uses the global
+  `fetch`/`Request`/`Response` built into Node.js 20+. The package has no runtime
+  dependencies.
+- **Migrated to ESLint 9 flat config** (`eslint.config.js`) with
+  `typescript-eslint` v8; removed the legacy `.eslintrc.cjs`.
+
+### Added
+
+- **TSDoc doc comments** across the whole library (client, base resource, entry
+  point, models, and every v1/v2 resource method — including HTTP verb/path,
+  params, and returns), surfaced in the generated `.d.ts`.
+- **`CLAUDE.md`** guides at the repo root, `src/api/`, and `tests/`.
+
 ## 1.1.0
 
 ### Fixed
