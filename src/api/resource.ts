@@ -1,3 +1,4 @@
+import type { z } from "zod";
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
 
@@ -39,32 +40,55 @@ abstract class RechargeResource {
   }
 
   /** Issue a `GET` for this resource's API version. */
-  protected _get<T>(url: string, query?: Record<string, string>): Promise<T> {
-    return this.client.get(url, this.rechargeVersion, query);
+  protected _get<T>(
+    url: string,
+    query?: Record<string, string>,
+    schema?: z.ZodType<T>
+  ): Promise<T> {
+    return this.client.get(url, this.rechargeVersion, query, schema);
   }
 
   /** Issue a `POST` for this resource's API version. */
-  protected _post<T>(url: string, body?: unknown): Promise<T> {
-    return this.client.post(url, this.rechargeVersion, body);
+  protected _post<T>(
+    url: string,
+    body?: unknown,
+    schema?: z.ZodType<T>
+  ): Promise<T> {
+    return this.client.post(url, this.rechargeVersion, body, schema);
   }
 
   /** Issue a `PUT` for this resource's API version. */
-  protected _put<T>(url: string, body?: unknown): Promise<T> {
-    return this.client.put(url, this.rechargeVersion, body);
+  protected _put<T>(
+    url: string,
+    body?: unknown,
+    schema?: z.ZodType<T>
+  ): Promise<T> {
+    return this.client.put(url, this.rechargeVersion, body, schema);
   }
 
   /** Issue a `DELETE` for this resource's API version. */
-  protected _delete<T>(url: string, body?: unknown): Promise<T> {
-    return this.client.delete(url, this.rechargeVersion, body);
+  protected _delete<T>(
+    url: string,
+    body?: unknown,
+    schema?: z.ZodType<T>
+  ): Promise<T> {
+    return this.client.delete(url, this.rechargeVersion, body, schema);
   }
 
   /** Fetch and concatenate every page of a list endpoint. */
   protected _paginate<T>(
     url: string,
     responseKey: string,
-    query?: Record<string, string>
+    query?: Record<string, string>,
+    itemSchema?: z.ZodType<T>
   ): Promise<T[]> {
-    return this.client.paginate(url, this.rechargeVersion, responseKey, query);
+    return this.client.paginate(
+      url,
+      this.rechargeVersion,
+      responseKey,
+      query,
+      itemSchema
+    );
   }
 }
 

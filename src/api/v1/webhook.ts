@@ -1,5 +1,13 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  Webhook,
+  WebhookResponse,
+  type WebhookListParams,
+  type WebhookCreateBody,
+  type WebhookUpdateBody,
+  type WebhookTestBody
+} from "~/models/api/v1/webhook";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +30,8 @@ class WebhookResource extends RechargeResource {
    * @param body - The webhook attributes to create.
    * @returns The created webhook record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(this.url, body);
+  create(body: WebhookCreateBody): Promise<WebhookResponse> {
+    return this._post(this.url, body, WebhookResponse);
   }
 
   /**
@@ -34,8 +42,8 @@ class WebhookResource extends RechargeResource {
    * @param webhookId - The Recharge webhook ID.
    * @returns The webhook record.
    */
-  get(webhookId: number): Promise<unknown> {
-    return this._get(`${this.url}/${webhookId}`);
+  get(webhookId: number): Promise<WebhookResponse> {
+    return this._get(`${this.url}/${webhookId}`, undefined, WebhookResponse);
   }
 
   /**
@@ -47,8 +55,8 @@ class WebhookResource extends RechargeResource {
    * @param body - The webhook attributes to update.
    * @returns The updated webhook record.
    */
-  update(webhookId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${webhookId}`, body);
+  update(webhookId: number, body: WebhookUpdateBody): Promise<WebhookResponse> {
+    return this._put(`${this.url}/${webhookId}`, body, WebhookResponse);
   }
 
   /**
@@ -59,7 +67,7 @@ class WebhookResource extends RechargeResource {
    * @param webhookId - The Recharge webhook ID.
    * @returns The API response for the deletion.
    */
-  delete(webhookId: number): Promise<unknown> {
+  delete(webhookId: number): Promise<undefined> {
     return this._delete(`${this.url}/${webhookId}`);
   }
 
@@ -71,8 +79,13 @@ class WebhookResource extends RechargeResource {
    * @param query - Optional query parameters for filtering and pagination.
    * @returns The paginated list of webhook records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(this.url, "webhooks", query);
+  list(query?: WebhookListParams): Promise<Webhook[]> {
+    return this._paginate(
+      this.url,
+      "webhooks",
+      query as Record<string, string> | undefined,
+      Webhook
+    );
   }
 
   /**
@@ -83,8 +96,8 @@ class WebhookResource extends RechargeResource {
    * @param body - Optional attributes describing the test event.
    * @returns The API response for the test request.
    */
-  test(body?: object): Promise<unknown> {
-    return this._post(`${this.url}/test`, body);
+  test(body?: WebhookTestBody): Promise<WebhookResponse> {
+    return this._post(`${this.url}/test`, body, WebhookResponse);
   }
 }
 

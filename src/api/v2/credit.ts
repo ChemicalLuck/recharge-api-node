@@ -1,5 +1,16 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  CreditAccount,
+  CreditAccountResponse,
+  CreditAdjustment,
+  CreditAdjustmentResponse,
+  type CreditAccountListParams,
+  type CreditAdjustmentListParams,
+  type CreditAccountCreateBody,
+  type CreditAccountUpdateBody,
+  type CreditAdjustmentCreateBody
+} from "~/models/api/v2/credit";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +33,8 @@ class CreditResource extends RechargeResource {
    * @param body - The credit account payload.
    * @returns The created credit account record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: CreditAccountCreateBody): Promise<CreditAccountResponse> {
+    return this._post(`${this.url}`, body, CreditAccountResponse);
   }
 
   /**
@@ -34,8 +45,12 @@ class CreditResource extends RechargeResource {
    * @param creditAccountId - The Recharge credit account ID.
    * @returns The credit account record.
    */
-  get(creditAccountId: number): Promise<unknown> {
-    return this._get(`${this.url}/${creditAccountId}`);
+  get(creditAccountId: number): Promise<CreditAccountResponse> {
+    return this._get(
+      `${this.url}/${creditAccountId}`,
+      undefined,
+      CreditAccountResponse
+    );
   }
 
   /**
@@ -47,8 +62,15 @@ class CreditResource extends RechargeResource {
    * @param body - The fields to update.
    * @returns The updated credit account record.
    */
-  update(creditAccountId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${creditAccountId}`, body);
+  update(
+    creditAccountId: number,
+    body: CreditAccountUpdateBody
+  ): Promise<CreditAccountResponse> {
+    return this._put(
+      `${this.url}/${creditAccountId}`,
+      body,
+      CreditAccountResponse
+    );
   }
 
   /**
@@ -59,8 +81,13 @@ class CreditResource extends RechargeResource {
    * @param query - Optional query string parameters for filtering and pagination.
    * @returns The list of credit account records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "credit_accounts", query);
+  list(query?: CreditAccountListParams): Promise<CreditAccount[]> {
+    return this._paginate(
+      `${this.url}`,
+      "credit_accounts",
+      query as Record<string, string> | undefined,
+      CreditAccount
+    );
   }
 
   /**
@@ -72,10 +99,14 @@ class CreditResource extends RechargeResource {
    * @param body - The credit adjustment payload.
    * @returns The created credit adjustment record.
    */
-  createAdjustment(creditAccountId: number, body: object): Promise<unknown> {
+  createAdjustment(
+    creditAccountId: number,
+    body: CreditAdjustmentCreateBody
+  ): Promise<CreditAdjustmentResponse> {
     return this._post(
       `${this.url}/${creditAccountId}/credit_adjustments`,
-      body
+      body,
+      CreditAdjustmentResponse
     );
   }
 
@@ -90,12 +121,13 @@ class CreditResource extends RechargeResource {
    */
   listAdjustments(
     creditAccountId: number,
-    query?: Record<string, string>
-  ): Promise<unknown> {
+    query?: CreditAdjustmentListParams
+  ): Promise<CreditAdjustment[]> {
     return this._paginate(
       `${this.url}/${creditAccountId}/credit_adjustments`,
       "credit_adjustments",
-      query
+      query as Record<string, string> | undefined,
+      CreditAdjustment
     );
   }
 
@@ -109,11 +141,14 @@ class CreditResource extends RechargeResource {
    * @param query - Optional query string parameters for filtering and pagination.
    * @returns The list of credit adjustment records.
    */
-  listAllAdjustments(query?: Record<string, string>): Promise<unknown> {
+  listAllAdjustments(
+    query?: CreditAdjustmentListParams
+  ): Promise<CreditAdjustment[]> {
     return this._paginate(
       `${this.baseUrl}/credit_adjustments`,
       "credit_adjustments",
-      query
+      query as Record<string, string> | undefined,
+      CreditAdjustment
     );
   }
 }

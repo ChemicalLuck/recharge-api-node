@@ -51,6 +51,44 @@ Requests are automatically retried (up to 3 times) on `429` and `5xx` responses,
 honouring the `Retry-After` header when present. `list` methods transparently follow
 pagination (Link headers for 2021-01, cursors for 2021-11) and return the full result set.
 
+### Typed responses & validation
+
+Every method returns a concrete type. Single-record endpoints resolve to their
+response envelope, `list` methods resolve to an array of the entity, and
+`delete`/void endpoints resolve to `undefined`:
+
+```typescript
+const { charge } = await recharge.v2.charge.get(123); // charge.id: number
+const charges = await recharge.v2.charge.list({ status: "success" }); // Charge[]
+await recharge.v2.subscription.delete(1); // Promise<undefined>
+```
+
+The schemas (and their inferred types) are exported, namespaced by version to avoid
+`v1`/`v2` name clashes:
+
+```typescript
+import { v2Models } from "@ChemicalLuck/recharge-api-node";
+
+function totalOf(charge: v2Models.Charge): string {
+  return charge.total_price;
+}
+```
+
+Responses are validated against these schemas at runtime, but **validation never
+throws** — it is a safety net, not a gate. If the API returns data that doesn't match
+the schema (a renamed field, an unmodeled shape), the `onValidationError` handler runs
+and the raw data is still returned. Object schemas are loose, so unknown keys the API
+adds are preserved rather than dropped.
+
+```typescript
+const recharge = new Recharge("your-api-key", {
+  // Called on schema drift; defaults to console.warn. The raw response is still returned.
+  onValidationError: ({ context, issues }) => logger.warn(context, issues),
+  // Set to false to skip runtime validation entirely (types still apply).
+  validate: true
+});
+```
+
 ## Resources
 
 ### v1 (2021-01)

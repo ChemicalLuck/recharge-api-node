@@ -1,2 +1,8 @@
 node_modules/
 dist/
+
+# Local API reference docs (used for schema authoring, not published)
+Recharge API Reference - v1.html
+Recharge API Reference - v2.html
+Recharge API Reference - v1_files/
+Recharge API Reference - v2_files/

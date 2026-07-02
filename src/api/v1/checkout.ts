@@ -1,5 +1,13 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  CheckoutResponse,
+  CheckoutShippingRatesResponse,
+  CheckoutChargeResponse,
+  type CheckoutCreateBody,
+  type CheckoutUpdateBody,
+  type CheckoutChargeBody
+} from "~/models/api/v1/checkout";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +30,8 @@ class CheckoutResource extends RechargeResource {
    * @param body - The checkout attributes to create.
    * @returns The created checkout record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: CheckoutCreateBody): Promise<CheckoutResponse> {
+    return this._post(`${this.url}`, body, CheckoutResponse);
   }
 
   /**
@@ -34,8 +42,8 @@ class CheckoutResource extends RechargeResource {
    * @param token - The checkout token.
    * @returns The checkout record.
    */
-  get(token: string): Promise<unknown> {
-    return this._get(`${this.url}/${token}`);
+  get(token: string): Promise<CheckoutResponse> {
+    return this._get(`${this.url}/${token}`, undefined, CheckoutResponse);
   }
 
   /**
@@ -47,8 +55,8 @@ class CheckoutResource extends RechargeResource {
    * @param body - The checkout attributes to update.
    * @returns The updated checkout record.
    */
-  update(token: string, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${token}`, body);
+  update(token: string, body: CheckoutUpdateBody): Promise<CheckoutResponse> {
+    return this._put(`${this.url}/${token}`, body, CheckoutResponse);
   }
 
   /**
@@ -59,8 +67,12 @@ class CheckoutResource extends RechargeResource {
    * @param token - The checkout token.
    * @returns The available shipping rates.
    */
-  get_shipping_rates(token: string): Promise<unknown> {
-    return this._get(`${this.url}/${token}/shipping_rates`);
+  get_shipping_rates(token: string): Promise<CheckoutShippingRatesResponse> {
+    return this._get(
+      `${this.url}/${token}/shipping_rates`,
+      undefined,
+      CheckoutShippingRatesResponse
+    );
   }
 
   /**
@@ -72,8 +84,15 @@ class CheckoutResource extends RechargeResource {
    * @param body - Optional charge attributes such as the payment token.
    * @returns The resulting charge record.
    */
-  process(token: string, body?: object): Promise<unknown> {
-    return this._post(`${this.url}/${token}/charge`, body);
+  process(
+    token: string,
+    body?: CheckoutChargeBody
+  ): Promise<CheckoutChargeResponse> {
+    return this._post(
+      `${this.url}/${token}/charge`,
+      body,
+      CheckoutChargeResponse
+    );
   }
 }
 

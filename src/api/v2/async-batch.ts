@@ -1,5 +1,16 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  AsyncBatch,
+  AsyncBatchTask,
+  AsyncBatchResponse,
+  AsyncBatchProcessResponse,
+  AsyncBatchTaskCreateResponse,
+  type AsyncBatchListParams,
+  type AsyncBatchCreate,
+  type AsyncBatchTaskListParams,
+  type AsyncBatchTaskCreate
+} from "~/models/api/v2/async-batch";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +33,8 @@ class AsyncBatchResource extends RechargeResource {
    * @param body - The async batch payload.
    * @returns The created async batch record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: AsyncBatchCreate): Promise<AsyncBatchResponse> {
+    return this._post(`${this.url}`, body, AsyncBatchResponse);
   }
 
   /**
@@ -34,8 +45,8 @@ class AsyncBatchResource extends RechargeResource {
    * @param batchId - The Recharge async batch ID.
    * @returns The async batch record.
    */
-  get(batchId: number): Promise<unknown> {
-    return this._get(`${this.url}/${batchId}`);
+  get(batchId: number): Promise<AsyncBatchResponse> {
+    return this._get(`${this.url}/${batchId}`, undefined, AsyncBatchResponse);
   }
 
   /**
@@ -46,8 +57,13 @@ class AsyncBatchResource extends RechargeResource {
    * @param query - Optional query string parameters for filtering and pagination.
    * @returns The list of async batch records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "async_batches", query);
+  list(query?: AsyncBatchListParams): Promise<AsyncBatch[]> {
+    return this._paginate(
+      `${this.url}`,
+      "async_batches",
+      query as Record<string, string> | undefined,
+      AsyncBatch
+    );
   }
 
   /**
@@ -58,8 +74,12 @@ class AsyncBatchResource extends RechargeResource {
    * @param batchId - The Recharge async batch ID.
    * @returns The API response for the process request.
    */
-  process(batchId: number): Promise<unknown> {
-    return this._post(`${this.url}/${batchId}/process`);
+  process(batchId: number): Promise<AsyncBatchProcessResponse> {
+    return this._post(
+      `${this.url}/${batchId}/process`,
+      undefined,
+      AsyncBatchProcessResponse
+    );
   }
 
   /**
@@ -71,8 +91,15 @@ class AsyncBatchResource extends RechargeResource {
    * @param body - The task payload.
    * @returns The created task record.
    */
-  createTask(batchId: number, body: object): Promise<unknown> {
-    return this._post(`${this.url}/${batchId}/tasks`, body);
+  createTask(
+    batchId: number,
+    body: AsyncBatchTaskCreate
+  ): Promise<AsyncBatchTaskCreateResponse> {
+    return this._post(
+      `${this.url}/${batchId}/tasks`,
+      body,
+      AsyncBatchTaskCreateResponse
+    );
   }
 
   /**
@@ -84,8 +111,16 @@ class AsyncBatchResource extends RechargeResource {
    * @param query - Optional query string parameters for filtering and pagination.
    * @returns The list of task records.
    */
-  listTasks(batchId: number, query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}/${batchId}/tasks`, "tasks", query);
+  listTasks(
+    batchId: number,
+    query?: AsyncBatchTaskListParams
+  ): Promise<AsyncBatchTask[]> {
+    return this._paginate(
+      `${this.url}/${batchId}/tasks`,
+      "tasks",
+      query as Record<string, string> | undefined,
+      AsyncBatchTask
+    );
   }
 }
 

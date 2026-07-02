@@ -1,6 +1,19 @@
 import * as v1 from "~/api/v1";
 import * as v2 from "~/api/v2";
-import RechargeClient from "~/client";
+import RechargeClient, { type RechargeClientOptions } from "~/client";
+
+/**
+ * Duck-type check for a {@link RechargeClient}. Used instead of `instanceof`
+ * because tests inject a fake client cast as `RechargeClient`, which would fail
+ * an `instanceof` check.
+ */
+function isRechargeClient(value: unknown): value is RechargeClient {
+  return (
+    !!value &&
+    typeof (value as RechargeClient).get === "function" &&
+    typeof (value as RechargeClient).paginate === "function"
+  );
+}
 
 /**
  * Namespace of resources for the Recharge 2021-01 (v1) API.
@@ -113,6 +126,14 @@ class RechargeV2 {
  * const recharge = new Recharge("your-api-key");
  * const subscriptions = await recharge.v2.subscription.list();
  * ```
+ *
+ * @example Configure runtime response validation:
+ * ```typescript
+ * const recharge = new Recharge("your-api-key", {
+ *   onValidationError: ({ context, issues }) =>
+ *     myLogger.warn(context, issues)
+ * });
+ * ```
  */
 class Recharge {
   private client: RechargeClient;
@@ -123,14 +144,35 @@ class Recharge {
 
   /**
    * @param apiKey - The Recharge store API token.
-   * @param client - Optional pre-configured client (mainly for testing).
+   * @param options - Optional client/validation configuration.
    */
-  constructor(apiKey: string, client?: RechargeClient) {
-    this.client = client ?? new RechargeClient(apiKey);
+  constructor(apiKey: string, options?: RechargeClientOptions);
+  /**
+   * @param apiKey - The Recharge store API token.
+   * @param client - A pre-configured client (mainly for testing).
+   * @param options - Optional client/validation configuration.
+   */
+  constructor(
+    apiKey: string,
+    client?: RechargeClient,
+    options?: RechargeClientOptions
+  );
+  constructor(
+    apiKey: string,
+    clientOrOptions?: RechargeClient | RechargeClientOptions,
+    options?: RechargeClientOptions
+  ) {
+    const injectedClient = isRechargeClient(clientOrOptions)
+      ? clientOrOptions
+      : undefined;
+    const opts = isRechargeClient(clientOrOptions) ? options : clientOrOptions;
+    this.client = injectedClient ?? new RechargeClient(apiKey, opts ?? {});
     this.v1 = new RechargeV1(this.client);
     this.v2 = new RechargeV2(this.client);
   }
 }
 
 export { Recharge };
+export type { RechargeClientOptions } from "~/client";
+export type { OnValidationError, ValidationErrorInfo } from "~/validation";
 export * from "./models";

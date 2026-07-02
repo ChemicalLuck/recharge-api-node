@@ -1,5 +1,15 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import { z } from "zod";
+import {
+  Customer,
+  CustomerResponse,
+  CustomerPaymentSourcesResponse,
+  type CustomerListParams,
+  type CustomerCountParams,
+  type CustomerCreate,
+  type CustomerUpdate
+} from "~/models/api/v1/customer";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +32,8 @@ class CustomerResource extends RechargeResource {
    * @param body - The customer attributes to create.
    * @returns The created customer record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: CustomerCreate): Promise<CustomerResponse> {
+    return this._post(`${this.url}`, body, CustomerResponse);
   }
 
   /**
@@ -34,8 +44,8 @@ class CustomerResource extends RechargeResource {
    * @param customerId - The Recharge customer ID.
    * @returns The customer record.
    */
-  get(customerId: number): Promise<unknown> {
-    return this._get(`${this.url}/${customerId}`);
+  get(customerId: number): Promise<CustomerResponse> {
+    return this._get(`${this.url}/${customerId}`, undefined, CustomerResponse);
   }
 
   /**
@@ -47,8 +57,8 @@ class CustomerResource extends RechargeResource {
    * @param body - The customer attributes to update.
    * @returns The updated customer record.
    */
-  update(customerId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${customerId}`, body);
+  update(customerId: number, body: CustomerUpdate): Promise<CustomerResponse> {
+    return this._put(`${this.url}/${customerId}`, body, CustomerResponse);
   }
 
   /**
@@ -59,7 +69,7 @@ class CustomerResource extends RechargeResource {
    * @param customerId - The Recharge customer ID.
    * @returns The API response for the deletion.
    */
-  delete(customerId: number): Promise<unknown> {
+  delete(customerId: number): Promise<undefined> {
     return this._delete(`${this.url}/${customerId}`);
   }
 
@@ -71,8 +81,13 @@ class CustomerResource extends RechargeResource {
    * @param query - Optional query parameters for filtering and pagination.
    * @returns The paginated list of customer records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "customers", query);
+  list(query?: CustomerListParams): Promise<Customer[]> {
+    return this._paginate(
+      `${this.url}`,
+      "customers",
+      query as Record<string, string> | undefined,
+      Customer
+    );
   }
 
   /**
@@ -83,8 +98,12 @@ class CustomerResource extends RechargeResource {
    * @param query - Optional query parameters for filtering the count.
    * @returns The customer count.
    */
-  count(query?: Record<string, string>): Promise<unknown> {
-    return this._get(`${this.url}/count`, query);
+  count(query?: CustomerCountParams): Promise<{ count: number }> {
+    return this._get(
+      `${this.url}/count`,
+      query as Record<string, string> | undefined,
+      z.object({ count: z.number() })
+    );
   }
 
   /**
@@ -95,8 +114,12 @@ class CustomerResource extends RechargeResource {
    * @param customerId - The Recharge customer ID.
    * @returns The customer's payment sources.
    */
-  payment_sources(customerId: number): Promise<unknown> {
-    return this._get(`${this.url}/${customerId}/payment_sources`);
+  payment_sources(customerId: number): Promise<CustomerPaymentSourcesResponse> {
+    return this._get(
+      `${this.url}/${customerId}/payment_sources`,
+      undefined,
+      CustomerPaymentSourcesResponse
+    );
   }
 }
 

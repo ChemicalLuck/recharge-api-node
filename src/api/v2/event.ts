@@ -1,5 +1,6 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import { Event, type EventListParams } from "~/models/api/v2/event";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +23,13 @@ class EventResource extends RechargeResource {
    * @param query - Optional query string parameters for filtering and pagination.
    * @returns The list of event records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "events", query);
+  list(query?: EventListParams): Promise<Event[]> {
+    return this._paginate(
+      `${this.url}`,
+      "events",
+      query as Record<string, string> | undefined,
+      Event
+    );
   }
 }
 

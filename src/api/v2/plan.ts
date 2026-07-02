@@ -1,5 +1,16 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  Plan,
+  PlanResponse,
+  PlansResponse,
+  type PlanListParams,
+  type PlanCreateBody,
+  type PlanUpdateBody,
+  type PlanBulkCreateBody,
+  type PlanBulkUpdateBody,
+  type PlanBulkDeleteBody
+} from "~/models/api/v2/plan";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +33,8 @@ class PlanResource extends RechargeResource {
    * @param body - The plan payload.
    * @returns The created plan record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: PlanCreateBody): Promise<PlanResponse> {
+    return this._post(`${this.url}`, body, PlanResponse);
   }
 
   /**
@@ -35,8 +46,8 @@ class PlanResource extends RechargeResource {
    * @param body - The fields to update.
    * @returns The updated plan record.
    */
-  update(planId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${planId}`, body);
+  update(planId: number, body: PlanUpdateBody): Promise<PlanResponse> {
+    return this._put(`${this.url}/${planId}`, body, PlanResponse);
   }
 
   /**
@@ -47,7 +58,7 @@ class PlanResource extends RechargeResource {
    * @param planId - The Recharge plan ID.
    * @returns The API response for the deletion.
    */
-  delete(planId: number): Promise<unknown> {
+  delete(planId: number): Promise<undefined> {
     return this._delete(`${this.url}/${planId}`);
   }
 
@@ -59,8 +70,13 @@ class PlanResource extends RechargeResource {
    * @param query - Optional query string parameters for filtering and pagination.
    * @returns The list of plan records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "plans", query);
+  list(query?: PlanListParams): Promise<Plan[]> {
+    return this._paginate(
+      `${this.url}`,
+      "plans",
+      query as Record<string, string> | undefined,
+      Plan
+    );
   }
 
   /**
@@ -71,8 +87,8 @@ class PlanResource extends RechargeResource {
    * @param body - The payload listing the plans to create.
    * @returns The created plan records.
    */
-  bulkCreate(body: object): Promise<unknown> {
-    return this._post(`${this.url}/bulk`, body);
+  bulkCreate(body: PlanBulkCreateBody): Promise<PlansResponse> {
+    return this._post(`${this.url}/bulk`, body, PlansResponse);
   }
 
   /**
@@ -83,8 +99,8 @@ class PlanResource extends RechargeResource {
    * @param body - The payload listing the plans to update.
    * @returns The updated plan records.
    */
-  bulkUpdate(body: object): Promise<unknown> {
-    return this._put(`${this.url}/bulk`, body);
+  bulkUpdate(body: PlanBulkUpdateBody): Promise<PlansResponse> {
+    return this._put(`${this.url}/bulk`, body, PlansResponse);
   }
 
   /**
@@ -95,8 +111,8 @@ class PlanResource extends RechargeResource {
    * @param body - The payload listing the plans to delete.
    * @returns The API response for the bulk deletion.
    */
-  bulkDelete(body: object): Promise<unknown> {
-    return this._delete(`${this.url}/bulk`, body);
+  bulkDelete(body: PlanBulkDeleteBody): Promise<PlansResponse> {
+    return this._delete(`${this.url}/bulk`, body, PlansResponse);
   }
 }
 

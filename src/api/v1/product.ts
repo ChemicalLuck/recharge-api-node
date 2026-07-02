@@ -1,5 +1,13 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  Product,
+  ProductResponse,
+  type ProductListParams,
+  type ProductCountParams,
+  type ProductCreateBody,
+  type ProductUpdateBody
+} from "~/models/api/v1/product";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +30,8 @@ class ProductResource extends RechargeResource {
    * @param body - The product attributes to create.
    * @returns The created product record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: ProductCreateBody): Promise<ProductResponse> {
+    return this._post(`${this.url}`, body, ProductResponse);
   }
 
   /**
@@ -34,8 +42,8 @@ class ProductResource extends RechargeResource {
    * @param productId - The Recharge product ID.
    * @returns The product record.
    */
-  get(productId: number): Promise<unknown> {
-    return this._get(`${this.url}/${productId}`);
+  get(productId: number): Promise<ProductResponse> {
+    return this._get(`${this.url}/${productId}`, undefined, ProductResponse);
   }
 
   /**
@@ -47,8 +55,8 @@ class ProductResource extends RechargeResource {
    * @param body - The product attributes to update.
    * @returns The updated product record.
    */
-  update(productId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${productId}`, body);
+  update(productId: number, body: ProductUpdateBody): Promise<ProductResponse> {
+    return this._put(`${this.url}/${productId}`, body, ProductResponse);
   }
 
   /**
@@ -57,9 +65,9 @@ class ProductResource extends RechargeResource {
    * `DELETE /products/{productId}`
    *
    * @param productId - The Recharge product ID.
-   * @returns The API response for the deletion.
+   * @returns Nothing on success.
    */
-  delete(productId: number): Promise<unknown> {
+  delete(productId: number): Promise<undefined> {
     return this._delete(`${this.url}/${productId}`);
   }
 
@@ -71,8 +79,13 @@ class ProductResource extends RechargeResource {
    * @param query - Optional query parameters for filtering and pagination.
    * @returns The paginated list of product records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "products", query);
+  list(query?: ProductListParams): Promise<Product[]> {
+    return this._paginate(
+      `${this.url}`,
+      "products",
+      query as Record<string, string> | undefined,
+      Product
+    );
   }
 
   /**
@@ -83,8 +96,11 @@ class ProductResource extends RechargeResource {
    * @param query - Optional query parameters for filtering the count.
    * @returns The product count.
    */
-  count(query?: Record<string, string>): Promise<unknown> {
-    return this._get(`${this.url}/count`, query);
+  count(query?: ProductCountParams): Promise<{ count: number }> {
+    return this._get(
+      `${this.url}/count`,
+      query as Record<string, string> | undefined
+    );
   }
 }
 

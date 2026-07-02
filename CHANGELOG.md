@@ -2,6 +2,34 @@
 
 All notable changes to this project are documented in this file.
 
+## 1.3.0
+
+### Added
+
+- **Fully typed, runtime-validated responses.** Every v1/v2 resource method now
+  returns a concrete type instead of `Promise<unknown>` — single-record endpoints
+  return their response envelope (e.g. `{ charge: Charge }`), `list` methods return
+  `Entity[]`, and `delete`/void endpoints return `undefined`. Request bodies and
+  list query params are typed too.
+- **Zod schemas + inferred types** for every resource, exported (namespaced to
+  avoid v1/v2 name clashes) as `v1Models` and `v2Models`, plus shared leaf
+  fragments (e.g. `Money`, `AddressSummary`, `LineItem`). Types are derived from
+  the schemas via `z.infer`, so schema and type never drift apart.
+- **Non-throwing response validation.** Responses are validated against their
+  schema at runtime; on a mismatch (schema drift, renamed/missing fields) the
+  configurable `onValidationError` handler is called (default `console.warn`) and
+  the **raw** data is still returned — validation never throws. Configure via the
+  new `RechargeClient`/`Recharge` options:
+  `new Recharge(apiKey, { onValidationError, validate })`. Set `validate: false` to
+  skip runtime validation entirely (types still apply). Object schemas are `loose`,
+  so unknown keys the API adds are preserved rather than dropped.
+
+### Changed
+
+- **Added a runtime dependency on [`zod`](https://zod.dev)** (v4). The package is
+  no longer dependency-free; `zod` is a peer of the validation layer and is marked
+  `external` in the build so consumers dedupe a single copy.
+
 ## 1.2.0
 
 ### Changed

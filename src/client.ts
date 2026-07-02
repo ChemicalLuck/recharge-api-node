@@ -1,11 +1,35 @@
+import type { z } from "zod";
 import {
   RequestMethod,
   RechargeAPIVersion,
   HTTPResponseError,
   RechargeAPIError
 } from "~/models";
+import {
+  validate,
+  defaultOnValidationError,
+  type OnValidationError
+} from "~/validation";
 
 // `fetch`, `Request` and `Response` are provided as globals by Node.js 20+.
+
+/**
+ * Options for configuring a {@link RechargeClient}.
+ */
+export interface RechargeClientOptions {
+  /**
+   * Handler invoked when a response body fails runtime schema validation.
+   * Validation never throws; after this runs the raw data is still returned.
+   * Defaults to a `console.warn` logger.
+   */
+  onValidationError?: OnValidationError;
+  /**
+   * Whether to run runtime response validation at all. When `false`, schemas
+   * are ignored and raw parsed data is returned (types are still applied at
+   * compile time). Defaults to `true`.
+   */
+  validate?: boolean;
+}
 
 /**
  * Low-level HTTP client for the Recharge API.
@@ -22,16 +46,37 @@ class RechargeClient {
   private readonly _baseHeaders: Record<string, string>;
   private readonly _maxRetries = 3;
   private readonly _retryDelay = 3000;
+  private readonly _onValidationError: OnValidationError;
+  private readonly _validateEnabled: boolean;
 
   /**
    * @param apiKey - The Recharge store API token, sent as the
    * `X-Recharge-Access-Token` header on every request.
+   * @param options - Optional validation configuration.
    */
-  constructor(apiKey: string) {
+  constructor(apiKey: string, options: RechargeClientOptions = {}) {
     this._baseHeaders = {
       "X-Recharge-Access-Token": apiKey,
       "Content-Type": "application/json"
     };
+    this._onValidationError =
+      options.onValidationError ?? defaultOnValidationError;
+    this._validateEnabled = options.validate ?? true;
+  }
+
+  /**
+   * Validate parsed data against a schema, honouring the client-level
+   * `validate` toggle. Never throws — see {@link validate}.
+   */
+  private _validate<T>(
+    raw: unknown,
+    schema?: z.ZodType<T>,
+    context?: string
+  ): T {
+    if (!this._validateEnabled) {
+      return raw as T;
+    }
+    return validate<T>(raw, schema, this._onValidationError, context);
   }
 
   private _buildHeaders(version: RechargeAPIVersion): Record<string, string> {
@@ -139,10 +184,16 @@ class RechargeClient {
    *
    * @typeParam T - Expected shape of the parsed response.
    * @param response - The fetch response to read.
+   * @param schema - Optional schema to validate the parsed body against.
+   * @param context - Optional label describing the request, used in validation output.
    * @returns The parsed body, or `undefined` when there is no content.
    * @throws {RechargeAPIError} If a non-empty body is not valid JSON.
    */
-  async _extractData<T>(response: Response): Promise<T> {
+  async _extractData<T>(
+    response: Response,
+    schema?: z.ZodType<T>,
+    context?: string
+  ): Promise<T> {
     // Many endpoints (deletes, and some actions) reply 204 / empty body.
     if (response.status === 204) {
       return undefined as T;
@@ -151,13 +202,15 @@ class RechargeClient {
     if (!text) {
       return undefined as T;
     }
+    let raw: unknown;
     try {
-      return JSON.parse(text) as T;
+      raw = JSON.parse(text);
     } catch {
       throw new RechargeAPIError(
         `Failed to parse response body as JSON (status ${response.status})`
       );
     }
+    return this._validate<T>(raw, schema, context);
   }
 
   private _getNextPageV1(response: Response): string | undefined {
@@ -231,18 +284,28 @@ class RechargeClient {
    * @param version - API version, which selects the pagination strategy.
    * @param responseKey - The response property holding the array (e.g. `"charges"`).
    * @param query - Optional query parameters (applied to the first page).
+   * @param itemSchema - Optional schema to validate each list element against.
    * @returns All items across every page.
    */
   async paginate<T>(
     url: string,
     version: RechargeAPIVersion,
     responseKey: string,
-    query?: Record<string, string>
+    query?: Record<string, string>,
+    itemSchema?: z.ZodType<T>
   ): Promise<T[]> {
-    if (version === RechargeAPIVersion.v2) {
-      return this._paginateV2<T>(url, responseKey, query);
+    const items =
+      version === RechargeAPIVersion.v2
+        ? await this._paginateV2<T>(url, responseKey, query)
+        : await this._paginateV1<T>(url, responseKey, query);
+    if (!itemSchema) {
+      return items;
     }
-    return this._paginateV1<T>(url, responseKey, query);
+    // Validate each element individually so one drifted row only warns for
+    // that row instead of discarding the whole page.
+    return items.map((item, index) =>
+      this._validate<T>(item, itemSchema, `${responseKey}[${index}]`)
+    );
   }
 
   /**
@@ -252,12 +315,14 @@ class RechargeClient {
    * @param url - The absolute endpoint URL.
    * @param version - API version to request.
    * @param query - Optional query parameters.
+   * @param schema - Optional schema to validate the response body against.
    * @returns The parsed response body.
    */
   async get<T>(
     url: string,
     version: RechargeAPIVersion,
-    query?: Record<string, string>
+    query?: Record<string, string>,
+    schema?: z.ZodType<T>
   ): Promise<T> {
     const response = await this._request(
       RequestMethod.GET,
@@ -265,7 +330,7 @@ class RechargeClient {
       url,
       query
     );
-    return this._extractData<T>(response);
+    return this._extractData<T>(response, schema, `GET ${url}`);
   }
 
   /**
@@ -275,12 +340,14 @@ class RechargeClient {
    * @param url - The absolute endpoint URL.
    * @param version - API version to request.
    * @param json - Optional request body, serialized as JSON.
+   * @param schema - Optional schema to validate the response body against.
    * @returns The parsed response body.
    */
   async post<T>(
     url: string,
     version: RechargeAPIVersion,
-    json?: unknown
+    json?: unknown,
+    schema?: z.ZodType<T>
   ): Promise<T> {
     const response = await this._request(
       RequestMethod.POST,
@@ -289,7 +356,7 @@ class RechargeClient {
       undefined,
       json
     );
-    return this._extractData<T>(response);
+    return this._extractData<T>(response, schema, `POST ${url}`);
   }
 
   /**
@@ -299,12 +366,14 @@ class RechargeClient {
    * @param url - The absolute endpoint URL.
    * @param version - API version to request.
    * @param json - Optional request body, serialized as JSON.
+   * @param schema - Optional schema to validate the response body against.
    * @returns The parsed response body.
    */
   async put<T>(
     url: string,
     version: RechargeAPIVersion,
-    json?: unknown
+    json?: unknown,
+    schema?: z.ZodType<T>
   ): Promise<T> {
     const response = await this._request(
       RequestMethod.PUT,
@@ -313,7 +382,7 @@ class RechargeClient {
       undefined,
       json
     );
-    return this._extractData<T>(response);
+    return this._extractData<T>(response, schema, `PUT ${url}`);
   }
 
   /**
@@ -326,12 +395,14 @@ class RechargeClient {
    * @param url - The absolute endpoint URL.
    * @param version - API version to request.
    * @param json - Optional request body, serialized as JSON.
+   * @param schema - Optional schema to validate the response body against.
    * @returns The parsed response body.
    */
   async delete<T>(
     url: string,
     version: RechargeAPIVersion,
-    json?: unknown
+    json?: unknown,
+    schema?: z.ZodType<T>
   ): Promise<T> {
     const response = await this._request(
       RequestMethod.DELETE,
@@ -340,7 +411,7 @@ class RechargeClient {
       undefined,
       json
     );
-    return this._extractData<T>(response);
+    return this._extractData<T>(response, schema, `DELETE ${url}`);
   }
 }
 

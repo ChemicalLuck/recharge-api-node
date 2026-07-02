@@ -1,5 +1,14 @@
+import { z } from "zod";
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  Discount,
+  DiscountResponse,
+  type DiscountListParams,
+  type DiscountCreateBody,
+  type DiscountUpdateBody,
+  type DiscountApplyBody
+} from "~/models/api/v1/discount";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +31,8 @@ class DiscountResource extends RechargeResource {
    * @param body - The discount attributes to create.
    * @returns The created discount record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: DiscountCreateBody): Promise<DiscountResponse> {
+    return this._post(`${this.url}`, body, DiscountResponse);
   }
 
   /**
@@ -34,8 +43,8 @@ class DiscountResource extends RechargeResource {
    * @param discountId - The Recharge discount ID.
    * @returns The discount record.
    */
-  get(discountId: number): Promise<unknown> {
-    return this._get(`${this.url}/${discountId}`);
+  get(discountId: number): Promise<DiscountResponse> {
+    return this._get(`${this.url}/${discountId}`, undefined, DiscountResponse);
   }
 
   /**
@@ -47,8 +56,11 @@ class DiscountResource extends RechargeResource {
    * @param body - The discount attributes to update.
    * @returns The updated discount record.
    */
-  update(discountId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${discountId}`, body);
+  update(
+    discountId: number,
+    body: DiscountUpdateBody
+  ): Promise<DiscountResponse> {
+    return this._put(`${this.url}/${discountId}`, body, DiscountResponse);
   }
 
   /**
@@ -59,7 +71,7 @@ class DiscountResource extends RechargeResource {
    * @param discountId - The Recharge discount ID.
    * @returns The API response for the deletion.
    */
-  delete(discountId: number): Promise<unknown> {
+  delete(discountId: number): Promise<undefined> {
     return this._delete(`${this.url}/${discountId}`);
   }
 
@@ -71,8 +83,13 @@ class DiscountResource extends RechargeResource {
    * @param query - Optional query parameters for filtering and pagination.
    * @returns The paginated list of discount records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "discounts", query);
+  list(query?: DiscountListParams): Promise<Discount[]> {
+    return this._paginate(
+      `${this.url}`,
+      "discounts",
+      query as Record<string, string> | undefined,
+      Discount
+    );
   }
 
   /**
@@ -83,8 +100,12 @@ class DiscountResource extends RechargeResource {
    * @param query - Optional query parameters for filtering the count.
    * @returns The discount count.
    */
-  count(query?: Record<string, string>): Promise<unknown> {
-    return this._get(`${this.url}/count`, query);
+  count(query?: DiscountListParams): Promise<{ count: number }> {
+    return this._get(
+      `${this.url}/count`,
+      query as Record<string, string> | undefined,
+      z.object({ count: z.number() })
+    );
   }
 
   /**
@@ -96,8 +117,15 @@ class DiscountResource extends RechargeResource {
    * @param body - The discount to apply.
    * @returns The updated address record.
    */
-  applyToAddress(addressId: number, body: object): Promise<unknown> {
-    return this._post(`${this.baseUrl}/addresses/${addressId}/discounts`, body);
+  applyToAddress(
+    addressId: number,
+    body: DiscountApplyBody
+  ): Promise<{ address?: unknown }> {
+    return this._post(
+      `${this.baseUrl}/addresses/${addressId}/discounts`,
+      body,
+      z.looseObject({ address: z.unknown().optional() })
+    );
   }
 
   /**
@@ -109,8 +137,15 @@ class DiscountResource extends RechargeResource {
    * @param body - The discount to apply.
    * @returns The updated charge record.
    */
-  applyToCharge(chargeId: number, body: object): Promise<unknown> {
-    return this._post(`${this.baseUrl}/charges/${chargeId}/discounts`, body);
+  applyToCharge(
+    chargeId: number,
+    body: DiscountApplyBody
+  ): Promise<{ charge?: unknown }> {
+    return this._post(
+      `${this.baseUrl}/charges/${chargeId}/discounts`,
+      body,
+      z.looseObject({ charge: z.unknown().optional() })
+    );
   }
 
   /**
@@ -121,8 +156,12 @@ class DiscountResource extends RechargeResource {
    * @param discountId - The Recharge discount ID.
    * @returns The updated discount record.
    */
-  remove(discountId: number): Promise<unknown> {
-    return this._post(`${this.url}/${discountId}/remove`);
+  remove(discountId: number): Promise<DiscountResponse> {
+    return this._post(
+      `${this.url}/${discountId}/remove`,
+      undefined,
+      DiscountResponse
+    );
   }
 }
 

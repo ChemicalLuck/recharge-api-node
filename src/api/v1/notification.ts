@@ -1,5 +1,9 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  NotificationResponse,
+  type NotificationSendBody
+} from "~/models/api/v1/notification";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +26,8 @@ class NotificationResource extends RechargeResource {
    * @param body - The notification attributes to send.
    * @returns The API response for the sent notification.
    */
-  send(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  send(body: NotificationSendBody): Promise<NotificationResponse> {
+    return this._post(`${this.url}`, body, NotificationResponse);
   }
 }
 

@@ -1,5 +1,9 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  ShopResponse,
+  ShopShippingCountriesResponse
+} from "~/models/api/v1/shop";
 import RechargeResource from "../resource";
 
 /**
@@ -21,8 +25,8 @@ class ShopResource extends RechargeResource {
    *
    * @returns The shop record.
    */
-  get(): Promise<unknown> {
-    return this._get(`${this.url}`);
+  get(): Promise<ShopResponse> {
+    return this._get(`${this.url}`, undefined, ShopResponse);
   }
 
   /**
@@ -32,8 +36,12 @@ class ShopResource extends RechargeResource {
    *
    * @returns The list of shipping countries.
    */
-  shipping_countries(): Promise<unknown> {
-    return this._get(`${this.url}/shipping_countries`);
+  shipping_countries(): Promise<ShopShippingCountriesResponse> {
+    return this._get(
+      `${this.url}/shipping_countries`,
+      undefined,
+      ShopShippingCountriesResponse
+    );
   }
 }
 

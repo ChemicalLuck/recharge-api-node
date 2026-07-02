@@ -1,6 +1,6 @@
 {
   "name": "@chemicalluck/recharge-api-node",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "ReCharge API Node.js Client",
   "keywords": [
     "recharge",
@@ -63,5 +63,8 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.46.0",
     "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
   }
 }

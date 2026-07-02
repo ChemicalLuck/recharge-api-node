@@ -1,5 +1,13 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  Metafield,
+  MetafieldResponse,
+  MetafieldCountResponse,
+  type MetafieldListParams,
+  type MetafieldCreateBody,
+  type MetafieldUpdateBody
+} from "~/models/api/v1/metafield";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +30,8 @@ class MetafieldResource extends RechargeResource {
    * @param body - The metafield attributes to create.
    * @returns The created metafield record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: MetafieldCreateBody): Promise<MetafieldResponse> {
+    return this._post(`${this.url}`, body, MetafieldResponse);
   }
 
   /**
@@ -34,8 +42,12 @@ class MetafieldResource extends RechargeResource {
    * @param metafieldId - The Recharge metafield ID.
    * @returns The metafield record.
    */
-  get(metafieldId: number): Promise<unknown> {
-    return this._get(`${this.url}/${metafieldId}`);
+  get(metafieldId: number): Promise<MetafieldResponse> {
+    return this._get(
+      `${this.url}/${metafieldId}`,
+      undefined,
+      MetafieldResponse
+    );
   }
 
   /**
@@ -47,8 +59,11 @@ class MetafieldResource extends RechargeResource {
    * @param body - The metafield attributes to update.
    * @returns The updated metafield record.
    */
-  update(metafieldId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${metafieldId}`, body);
+  update(
+    metafieldId: number,
+    body: MetafieldUpdateBody
+  ): Promise<MetafieldResponse> {
+    return this._put(`${this.url}/${metafieldId}`, body, MetafieldResponse);
   }
 
   /**
@@ -59,7 +74,7 @@ class MetafieldResource extends RechargeResource {
    * @param metafieldId - The Recharge metafield ID.
    * @returns The API response for the deletion.
    */
-  delete(metafieldId: number): Promise<unknown> {
+  delete(metafieldId: number): Promise<undefined> {
     return this._delete(`${this.url}/${metafieldId}`);
   }
 
@@ -71,8 +86,13 @@ class MetafieldResource extends RechargeResource {
    * @param query - Optional query parameters for filtering and pagination.
    * @returns The paginated list of metafield records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "metafields", query);
+  list(query?: MetafieldListParams): Promise<Metafield[]> {
+    return this._paginate(
+      `${this.url}`,
+      "metafields",
+      query as Record<string, string> | undefined,
+      Metafield
+    );
   }
 
   /**
@@ -83,8 +103,12 @@ class MetafieldResource extends RechargeResource {
    * @param query - Optional query parameters for filtering the count.
    * @returns The metafield count.
    */
-  count(query?: Record<string, string>): Promise<unknown> {
-    return this._get(`${this.url}/count`, query);
+  count(query?: MetafieldListParams): Promise<MetafieldCountResponse> {
+    return this._get(
+      `${this.url}/count`,
+      query as Record<string, string> | undefined,
+      MetafieldCountResponse
+    );
   }
 }
 

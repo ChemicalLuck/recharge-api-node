@@ -1,5 +1,13 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  CheckoutResponse,
+  CheckoutShippingRatesResponse,
+  CheckoutProcessResponse,
+  type CheckoutCreateBody,
+  type CheckoutUpdateBody,
+  type CheckoutProcessBody
+} from "~/models/api/v2/checkout";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +30,8 @@ class CheckoutResource extends RechargeResource {
    * @param body - The checkout payload.
    * @returns The created checkout record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: CheckoutCreateBody): Promise<CheckoutResponse> {
+    return this._post(`${this.url}`, body, CheckoutResponse);
   }
 
   /**
@@ -34,8 +42,8 @@ class CheckoutResource extends RechargeResource {
    * @param checkoutId - The Recharge checkout token.
    * @returns The checkout record.
    */
-  get(checkoutId: string): Promise<unknown> {
-    return this._get(`${this.url}/${checkoutId}`);
+  get(checkoutId: string): Promise<CheckoutResponse> {
+    return this._get(`${this.url}/${checkoutId}`, undefined, CheckoutResponse);
   }
 
   /**
@@ -47,8 +55,11 @@ class CheckoutResource extends RechargeResource {
    * @param body - The fields to update.
    * @returns The updated checkout record.
    */
-  update(checkoutId: string, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${checkoutId}`, body);
+  update(
+    checkoutId: string,
+    body: CheckoutUpdateBody
+  ): Promise<CheckoutResponse> {
+    return this._put(`${this.url}/${checkoutId}`, body, CheckoutResponse);
   }
 
   /**
@@ -59,8 +70,12 @@ class CheckoutResource extends RechargeResource {
    * @param checkoutId - The Recharge checkout token.
    * @returns The available shipping rates.
    */
-  getShippingRates(checkoutId: string): Promise<unknown> {
-    return this._get(`${this.url}/${checkoutId}/shipping_rates`);
+  getShippingRates(checkoutId: string): Promise<CheckoutShippingRatesResponse> {
+    return this._get(
+      `${this.url}/${checkoutId}/shipping_rates`,
+      undefined,
+      CheckoutShippingRatesResponse
+    );
   }
 
   /**
@@ -72,8 +87,15 @@ class CheckoutResource extends RechargeResource {
    * @param body - Optional payload for processing the checkout (e.g. payment details).
    * @returns The processed checkout result.
    */
-  process(checkoutId: string, body?: object): Promise<unknown> {
-    return this._post(`${this.url}/${checkoutId}/process`, body);
+  process(
+    checkoutId: string,
+    body?: CheckoutProcessBody
+  ): Promise<CheckoutProcessResponse> {
+    return this._post(
+      `${this.url}/${checkoutId}/process`,
+      body,
+      CheckoutProcessResponse
+    );
   }
 }
 

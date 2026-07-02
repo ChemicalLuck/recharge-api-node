@@ -1,5 +1,16 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  Subscription,
+  SubscriptionResponse,
+  type SubscriptionListParams,
+  type SubscriptionCreate,
+  type SubscriptionUpdate,
+  type SubscriptionSetNextChargeDate,
+  type SubscriptionChangeAddress,
+  type SubscriptionCancel,
+  type SubscriptionGift
+} from "~/models/api/v2/subscription";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +33,8 @@ class SubscriptionResource extends RechargeResource {
    * @param body - The subscription payload.
    * @returns The created subscription record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: SubscriptionCreate): Promise<SubscriptionResponse> {
+    return this._post(`${this.url}`, body, SubscriptionResponse);
   }
 
   /**
@@ -34,8 +45,12 @@ class SubscriptionResource extends RechargeResource {
    * @param subscriptionId - The Recharge subscription ID.
    * @returns The subscription record.
    */
-  get(subscriptionId: number): Promise<unknown> {
-    return this._get(`${this.url}/${subscriptionId}`);
+  get(subscriptionId: number): Promise<SubscriptionResponse> {
+    return this._get(
+      `${this.url}/${subscriptionId}`,
+      undefined,
+      SubscriptionResponse
+    );
   }
 
   /**
@@ -47,8 +62,15 @@ class SubscriptionResource extends RechargeResource {
    * @param body - The fields to update.
    * @returns The updated subscription record.
    */
-  update(subscriptionId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${subscriptionId}`, body);
+  update(
+    subscriptionId: number,
+    body: SubscriptionUpdate
+  ): Promise<SubscriptionResponse> {
+    return this._put(
+      `${this.url}/${subscriptionId}`,
+      body,
+      SubscriptionResponse
+    );
   }
 
   /**
@@ -59,7 +81,7 @@ class SubscriptionResource extends RechargeResource {
    * @param subscriptionId - The Recharge subscription ID.
    * @returns The API response for the deletion.
    */
-  delete(subscriptionId: number): Promise<unknown> {
+  delete(subscriptionId: number): Promise<undefined> {
     return this._delete(`${this.url}/${subscriptionId}`);
   }
 
@@ -71,8 +93,13 @@ class SubscriptionResource extends RechargeResource {
    * @param query - Optional query string parameters for filtering and pagination.
    * @returns The list of subscription records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "subscriptions", query);
+  list(query?: SubscriptionListParams): Promise<Subscription[]> {
+    return this._paginate(
+      `${this.url}`,
+      "subscriptions",
+      query as Record<string, string> | undefined,
+      Subscription
+    );
   }
 
   /**
@@ -84,10 +111,14 @@ class SubscriptionResource extends RechargeResource {
    * @param body - The payload containing the new next charge date.
    * @returns The updated subscription record.
    */
-  setNextChargeDate(subscriptionId: number, body: object): Promise<unknown> {
+  setNextChargeDate(
+    subscriptionId: number,
+    body: SubscriptionSetNextChargeDate
+  ): Promise<SubscriptionResponse> {
     return this._post(
       `${this.url}/${subscriptionId}/set_next_charge_date`,
-      body
+      body,
+      SubscriptionResponse
     );
   }
 
@@ -100,8 +131,15 @@ class SubscriptionResource extends RechargeResource {
    * @param body - The payload describing the new address.
    * @returns The updated subscription record.
    */
-  changeAddress(subscriptionId: number, body: object): Promise<unknown> {
-    return this._post(`${this.url}/${subscriptionId}/change_address`, body);
+  changeAddress(
+    subscriptionId: number,
+    body: SubscriptionChangeAddress
+  ): Promise<SubscriptionResponse> {
+    return this._post(
+      `${this.url}/${subscriptionId}/change_address`,
+      body,
+      SubscriptionResponse
+    );
   }
 
   /**
@@ -113,8 +151,15 @@ class SubscriptionResource extends RechargeResource {
    * @param body - Optional payload describing the cancellation (e.g. reason).
    * @returns The updated subscription record.
    */
-  cancel(subscriptionId: number, body?: object): Promise<unknown> {
-    return this._post(`${this.url}/${subscriptionId}/cancel`, body);
+  cancel(
+    subscriptionId: number,
+    body?: SubscriptionCancel
+  ): Promise<SubscriptionResponse> {
+    return this._post(
+      `${this.url}/${subscriptionId}/cancel`,
+      body,
+      SubscriptionResponse
+    );
   }
 
   /**
@@ -125,8 +170,12 @@ class SubscriptionResource extends RechargeResource {
    * @param subscriptionId - The Recharge subscription ID.
    * @returns The updated subscription record.
    */
-  activate(subscriptionId: number): Promise<unknown> {
-    return this._post(`${this.url}/${subscriptionId}/activate`);
+  activate(subscriptionId: number): Promise<SubscriptionResponse> {
+    return this._post(
+      `${this.url}/${subscriptionId}/activate`,
+      undefined,
+      SubscriptionResponse
+    );
   }
 
   /**
@@ -138,8 +187,15 @@ class SubscriptionResource extends RechargeResource {
    * @param body - The payload describing the gift.
    * @returns The updated subscription record.
    */
-  gift(subscriptionId: number, body: object): Promise<unknown> {
-    return this._post(`${this.url}/${subscriptionId}/gift`, body);
+  gift(
+    subscriptionId: number,
+    body: SubscriptionGift
+  ): Promise<SubscriptionResponse> {
+    return this._post(
+      `${this.url}/${subscriptionId}/gift`,
+      body,
+      SubscriptionResponse
+    );
   }
 }
 

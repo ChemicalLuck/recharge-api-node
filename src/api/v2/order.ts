@@ -1,5 +1,13 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  Order,
+  OrderResponse,
+  type OrderListParams,
+  type OrderUpdateBody,
+  type OrderCloneBody,
+  type OrderDelayBody
+} from "~/models/api/v2/order";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +30,8 @@ class OrderResource extends RechargeResource {
    * @param orderId - The Recharge order ID.
    * @returns The order record.
    */
-  get(orderId: number): Promise<unknown> {
-    return this._get(`${this.url}/${orderId}`);
+  get(orderId: number): Promise<OrderResponse> {
+    return this._get(`${this.url}/${orderId}`, undefined, OrderResponse);
   }
 
   /**
@@ -35,8 +43,8 @@ class OrderResource extends RechargeResource {
    * @param body - The fields to update.
    * @returns The updated order record.
    */
-  update(orderId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${orderId}`, body);
+  update(orderId: number, body: OrderUpdateBody): Promise<OrderResponse> {
+    return this._put(`${this.url}/${orderId}`, body, OrderResponse);
   }
 
   /**
@@ -47,7 +55,7 @@ class OrderResource extends RechargeResource {
    * @param orderId - The Recharge order ID.
    * @returns The API response for the deletion.
    */
-  delete(orderId: number): Promise<unknown> {
+  delete(orderId: number): Promise<undefined> {
     return this._delete(`${this.url}/${orderId}`);
   }
 
@@ -59,8 +67,13 @@ class OrderResource extends RechargeResource {
    * @param query - Optional query string parameters for filtering and pagination.
    * @returns The list of order records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "orders", query);
+  list(query?: OrderListParams): Promise<Order[]> {
+    return this._paginate(
+      `${this.url}`,
+      "orders",
+      query as Record<string, string> | undefined,
+      Order
+    );
   }
 
   /**
@@ -72,8 +85,8 @@ class OrderResource extends RechargeResource {
    * @param body - Optional payload for the clone request.
    * @returns The cloned order record.
    */
-  clone(orderId: number, body?: object): Promise<unknown> {
-    return this._post(`${this.url}/${orderId}/clone`, body);
+  clone(orderId: number, body?: OrderCloneBody): Promise<OrderResponse> {
+    return this._post(`${this.url}/${orderId}/clone`, body, OrderResponse);
   }
 
   /**
@@ -85,8 +98,8 @@ class OrderResource extends RechargeResource {
    * @param body - Optional payload describing the delay.
    * @returns The updated order record.
    */
-  delay(orderId: number, body?: object): Promise<unknown> {
-    return this._post(`${this.url}/${orderId}/delay`, body);
+  delay(orderId: number, body?: OrderDelayBody): Promise<OrderResponse> {
+    return this._post(`${this.url}/${orderId}/delay`, body, OrderResponse);
   }
 }
 

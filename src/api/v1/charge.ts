@@ -1,5 +1,15 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  Charge,
+  ChargeResponse,
+  ChargeCountResponse,
+  type ChargeListParams,
+  type ChargeChangeNextChargeDate,
+  type ChargeSkipBody,
+  type ChargeRefundBody,
+  type ChargeApplyDiscountBody
+} from "~/models/api/v1/charge";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +32,8 @@ class ChargeResource extends RechargeResource {
    * @param chargeId - The Recharge charge ID.
    * @returns The charge record.
    */
-  get(chargeId: number): Promise<unknown> {
-    return this._get(`${this.url}/${chargeId}`);
+  get(chargeId: number): Promise<ChargeResponse> {
+    return this._get(`${this.url}/${chargeId}`, undefined, ChargeResponse);
   }
 
   /**
@@ -34,8 +44,13 @@ class ChargeResource extends RechargeResource {
    * @param query - Optional query parameters for filtering and pagination.
    * @returns The paginated list of charge records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "charges", query);
+  list(query?: ChargeListParams): Promise<Charge[]> {
+    return this._paginate(
+      `${this.url}`,
+      "charges",
+      query as Record<string, string> | undefined,
+      Charge
+    );
   }
 
   /**
@@ -46,8 +61,12 @@ class ChargeResource extends RechargeResource {
    * @param query - Optional query parameters for filtering the count.
    * @returns The charge count.
    */
-  count(query?: Record<string, string>): Promise<unknown> {
-    return this._get(`${this.url}/count`, query);
+  count(query?: ChargeListParams): Promise<ChargeCountResponse> {
+    return this._get(
+      `${this.url}/count`,
+      query as Record<string, string> | undefined,
+      ChargeCountResponse
+    );
   }
 
   /**
@@ -59,8 +78,15 @@ class ChargeResource extends RechargeResource {
    * @param body - The new charge date attributes.
    * @returns The updated charge record.
    */
-  change_next_charge_date(chargeId: number, body: object): Promise<unknown> {
-    return this._post(`${this.url}/${chargeId}/change_next_charge_date`, body);
+  change_next_charge_date(
+    chargeId: number,
+    body: ChargeChangeNextChargeDate
+  ): Promise<ChargeResponse> {
+    return this._post(
+      `${this.url}/${chargeId}/change_next_charge_date`,
+      body,
+      ChargeResponse
+    );
   }
 
   /**
@@ -72,8 +98,8 @@ class ChargeResource extends RechargeResource {
    * @param body - Optional attributes describing what to skip.
    * @returns The updated charge record.
    */
-  skip(chargeId: number, body?: object): Promise<unknown> {
-    return this._post(`${this.url}/${chargeId}/skip`, body);
+  skip(chargeId: number, body?: ChargeSkipBody): Promise<ChargeResponse> {
+    return this._post(`${this.url}/${chargeId}/skip`, body, ChargeResponse);
   }
 
   /**
@@ -85,8 +111,8 @@ class ChargeResource extends RechargeResource {
    * @param body - Optional attributes describing what to unskip.
    * @returns The updated charge record.
    */
-  unskip(chargeId: number, body?: object): Promise<unknown> {
-    return this._post(`${this.url}/${chargeId}/unskip`, body);
+  unskip(chargeId: number, body?: ChargeSkipBody): Promise<ChargeResponse> {
+    return this._post(`${this.url}/${chargeId}/unskip`, body, ChargeResponse);
   }
 
   /**
@@ -98,8 +124,8 @@ class ChargeResource extends RechargeResource {
    * @param body - Optional refund attributes such as amount.
    * @returns The refunded charge record.
    */
-  refund(chargeId: number, body?: object): Promise<unknown> {
-    return this._post(`${this.url}/${chargeId}/refund`, body);
+  refund(chargeId: number, body?: ChargeRefundBody): Promise<ChargeResponse> {
+    return this._post(`${this.url}/${chargeId}/refund`, body, ChargeResponse);
   }
 
   /**
@@ -110,8 +136,12 @@ class ChargeResource extends RechargeResource {
    * @param chargeId - The Recharge charge ID.
    * @returns The processed charge record.
    */
-  process(chargeId: number): Promise<unknown> {
-    return this._post(`${this.url}/${chargeId}/process`);
+  process(chargeId: number): Promise<ChargeResponse> {
+    return this._post(
+      `${this.url}/${chargeId}/process`,
+      undefined,
+      ChargeResponse
+    );
   }
 
   /**
@@ -122,8 +152,12 @@ class ChargeResource extends RechargeResource {
    * @param chargeId - The Recharge charge ID.
    * @returns The captured charge record.
    */
-  capture(chargeId: number): Promise<unknown> {
-    return this._post(`${this.url}/${chargeId}/capture_payment`);
+  capture(chargeId: number): Promise<ChargeResponse> {
+    return this._post(
+      `${this.url}/${chargeId}/capture_payment`,
+      undefined,
+      ChargeResponse
+    );
   }
 
   /**
@@ -135,8 +169,15 @@ class ChargeResource extends RechargeResource {
    * @param body - The discount to apply.
    * @returns The updated charge record.
    */
-  apply_discount(chargeId: number, body: object): Promise<unknown> {
-    return this._post(`${this.url}/${chargeId}/apply_discount`, body);
+  apply_discount(
+    chargeId: number,
+    body: ChargeApplyDiscountBody
+  ): Promise<ChargeResponse> {
+    return this._post(
+      `${this.url}/${chargeId}/apply_discount`,
+      body,
+      ChargeResponse
+    );
   }
 
   /**
@@ -147,8 +188,12 @@ class ChargeResource extends RechargeResource {
    * @param chargeId - The Recharge charge ID.
    * @returns The updated charge record.
    */
-  remove_discount(chargeId: number): Promise<unknown> {
-    return this._post(`${this.url}/${chargeId}/remove_discount`);
+  remove_discount(chargeId: number): Promise<ChargeResponse> {
+    return this._post(
+      `${this.url}/${chargeId}/remove_discount`,
+      undefined,
+      ChargeResponse
+    );
   }
 }
 

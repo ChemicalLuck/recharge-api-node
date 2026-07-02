@@ -1,5 +1,6 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import { StoreResponse } from "~/models/api/v2/store";
 import RechargeResource from "../resource";
 
 /**
@@ -21,8 +22,8 @@ class StoreResource extends RechargeResource {
    *
    * @returns The store record.
    */
-  get(): Promise<unknown> {
-    return this._get(`${this.url}`);
+  get(): Promise<StoreResponse> {
+    return this._get(`${this.url}`, undefined, StoreResponse);
   }
 }
 

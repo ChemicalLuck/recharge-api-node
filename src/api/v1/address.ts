@@ -1,5 +1,17 @@
 import RechargeResource from "../resource";
 import type RechargeClient from "~/client";
+import { z } from "zod";
+import {
+  Address,
+  AddressResponse,
+  AddressValidateResponse,
+  type AddressListParams,
+  type AddressCountParams,
+  type AddressCreate,
+  type AddressUpdate,
+  type AddressValidateBody,
+  type AddressApplyDiscountBody
+} from "~/models/api/v1/address";
 
 /**
  * Manage customer shipping addresses on the Recharge 2021-01 API.
@@ -21,10 +33,11 @@ class AddressResource extends RechargeResource {
    * @param body - The address attributes to create.
    * @returns The created address record.
    */
-  create(customerId: number, body: object): Promise<unknown> {
+  create(customerId: number, body: AddressCreate): Promise<AddressResponse> {
     return this._post(
       `${this.baseUrl}/customers/${customerId}/addresses`,
-      body
+      body,
+      AddressResponse
     );
   }
 
@@ -36,8 +49,8 @@ class AddressResource extends RechargeResource {
    * @param addressId - The Recharge address ID.
    * @returns The address record.
    */
-  get(addressId: number): Promise<unknown> {
-    return this._get(`${this.url}/${addressId}`);
+  get(addressId: number): Promise<AddressResponse> {
+    return this._get(`${this.url}/${addressId}`, undefined, AddressResponse);
   }
 
   /**
@@ -49,8 +62,8 @@ class AddressResource extends RechargeResource {
    * @param body - The address attributes to update.
    * @returns The updated address record.
    */
-  update(addressId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${addressId}`, body);
+  update(addressId: number, body: AddressUpdate): Promise<AddressResponse> {
+    return this._put(`${this.url}/${addressId}`, body, AddressResponse);
   }
 
   /**
@@ -61,7 +74,7 @@ class AddressResource extends RechargeResource {
    * @param addressId - The Recharge address ID.
    * @returns The API response for the deletion.
    */
-  delete(addressId: number): Promise<unknown> {
+  delete(addressId: number): Promise<undefined> {
     return this._delete(`${this.url}/${addressId}`);
   }
 
@@ -74,11 +87,12 @@ class AddressResource extends RechargeResource {
    * @param query - Optional query parameters for filtering and pagination.
    * @returns The paginated list of address records.
    */
-  list(customerId: number, query?: Record<string, string>): Promise<unknown> {
+  list(customerId: number, query?: AddressListParams): Promise<Address[]> {
     return this._paginate(
       `${this.baseUrl}/customers/${customerId}/addresses`,
       "addresses",
-      query
+      query as Record<string, string> | undefined,
+      Address
     );
   }
 
@@ -90,8 +104,12 @@ class AddressResource extends RechargeResource {
    * @param query - Optional query parameters for filtering the count.
    * @returns The address count.
    */
-  count(query?: Record<string, string>): Promise<unknown> {
-    return this._get(`${this.url}/count`, query);
+  count(query?: AddressCountParams): Promise<{ count: number }> {
+    return this._get(
+      `${this.url}/count`,
+      query as Record<string, string> | undefined,
+      z.object({ count: z.number() })
+    );
   }
 
   /**
@@ -102,8 +120,8 @@ class AddressResource extends RechargeResource {
    * @param body - The address attributes to validate.
    * @returns The validation result.
    */
-  validate(body: unknown): Promise<unknown> {
-    return this._post(`${this.url}/validate`, body);
+  validate(body: AddressValidateBody): Promise<AddressValidateResponse> {
+    return this._post(`${this.url}/validate`, body, AddressValidateResponse);
   }
 
   /**
@@ -115,8 +133,15 @@ class AddressResource extends RechargeResource {
    * @param body - The discount to apply.
    * @returns The updated address record.
    */
-  applyDiscount(addressId: number, body: unknown): Promise<unknown> {
-    return this._post(`${this.url}/${addressId}/discounts`, body);
+  applyDiscount(
+    addressId: number,
+    body: AddressApplyDiscountBody
+  ): Promise<AddressResponse> {
+    return this._post(
+      `${this.url}/${addressId}/discounts`,
+      body,
+      AddressResponse
+    );
   }
 }
 

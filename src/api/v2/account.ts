@@ -1,5 +1,10 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  Account,
+  AccountResponse,
+  type AccountListParams
+} from "~/models/api/v2/account";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +27,8 @@ class AccountResource extends RechargeResource {
    * @param accountId - The Recharge account ID.
    * @returns The account record.
    */
-  get(accountId: number): Promise<unknown> {
-    return this._get(`${this.url}/${accountId}`);
+  get(accountId: number): Promise<AccountResponse> {
+    return this._get(`${this.url}/${accountId}`, undefined, AccountResponse);
   }
 
   /**
@@ -34,8 +39,13 @@ class AccountResource extends RechargeResource {
    * @param query - Optional query string parameters for filtering and pagination.
    * @returns The list of account records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "accounts", query);
+  list(query?: AccountListParams): Promise<Account[]> {
+    return this._paginate(
+      `${this.url}`,
+      "accounts",
+      query as Record<string, string> | undefined,
+      Account
+    );
   }
 }
 

@@ -1,5 +1,12 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  Onetime,
+  OnetimeResponse,
+  type OnetimeListParams,
+  type OnetimeCreate,
+  type OnetimeUpdate
+} from "~/models/api/v2/onetime";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +29,8 @@ class OnetimeResource extends RechargeResource {
    * @param body - The one-time product payload.
    * @returns The created one-time product record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: OnetimeCreate): Promise<OnetimeResponse> {
+    return this._post(`${this.url}`, body, OnetimeResponse);
   }
 
   /**
@@ -34,8 +41,8 @@ class OnetimeResource extends RechargeResource {
    * @param onetimeId - The Recharge one-time product ID.
    * @returns The one-time product record.
    */
-  get(onetimeId: number): Promise<unknown> {
-    return this._get(`${this.url}/${onetimeId}`);
+  get(onetimeId: number): Promise<OnetimeResponse> {
+    return this._get(`${this.url}/${onetimeId}`, undefined, OnetimeResponse);
   }
 
   /**
@@ -47,8 +54,8 @@ class OnetimeResource extends RechargeResource {
    * @param body - The fields to update.
    * @returns The updated one-time product record.
    */
-  update(onetimeId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${onetimeId}`, body);
+  update(onetimeId: number, body: OnetimeUpdate): Promise<OnetimeResponse> {
+    return this._put(`${this.url}/${onetimeId}`, body, OnetimeResponse);
   }
 
   /**
@@ -59,7 +66,7 @@ class OnetimeResource extends RechargeResource {
    * @param onetimeId - The Recharge one-time product ID.
    * @returns The API response for the deletion.
    */
-  delete(onetimeId: number): Promise<unknown> {
+  delete(onetimeId: number): Promise<undefined> {
     return this._delete(`${this.url}/${onetimeId}`);
   }
 
@@ -71,8 +78,13 @@ class OnetimeResource extends RechargeResource {
    * @param query - Optional query string parameters for filtering and pagination.
    * @returns The list of one-time product records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "onetimes", query);
+  list(query?: OnetimeListParams): Promise<Onetime[]> {
+    return this._paginate(
+      `${this.url}`,
+      "onetimes",
+      query as Record<string, string> | undefined,
+      Onetime
+    );
   }
 }
 

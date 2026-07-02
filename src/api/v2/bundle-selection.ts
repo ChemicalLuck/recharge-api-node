@@ -1,5 +1,12 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  BundleSelection,
+  BundleSelectionResponse,
+  type BundleSelectionListParams,
+  type BundleSelectionCreateBody,
+  type BundleSelectionUpdateBody
+} from "~/models/api/v2/bundle-selection";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +29,8 @@ class BundleSelectionResource extends RechargeResource {
    * @param body - The bundle selection payload.
    * @returns The created bundle selection record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: BundleSelectionCreateBody): Promise<BundleSelectionResponse> {
+    return this._post(`${this.url}`, body, BundleSelectionResponse);
   }
 
   /**
@@ -34,8 +41,12 @@ class BundleSelectionResource extends RechargeResource {
    * @param bundleSelectionId - The Recharge bundle selection ID.
    * @returns The bundle selection record.
    */
-  get(bundleSelectionId: number): Promise<unknown> {
-    return this._get(`${this.url}/${bundleSelectionId}`);
+  get(bundleSelectionId: number): Promise<BundleSelectionResponse> {
+    return this._get(
+      `${this.url}/${bundleSelectionId}`,
+      undefined,
+      BundleSelectionResponse
+    );
   }
 
   /**
@@ -47,8 +58,15 @@ class BundleSelectionResource extends RechargeResource {
    * @param body - The fields to update.
    * @returns The updated bundle selection record.
    */
-  update(bundleSelectionId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${bundleSelectionId}`, body);
+  update(
+    bundleSelectionId: number,
+    body: BundleSelectionUpdateBody
+  ): Promise<BundleSelectionResponse> {
+    return this._put(
+      `${this.url}/${bundleSelectionId}`,
+      body,
+      BundleSelectionResponse
+    );
   }
 
   /**
@@ -57,9 +75,9 @@ class BundleSelectionResource extends RechargeResource {
    * `DELETE /bundle_selections/{bundleSelectionId}`
    *
    * @param bundleSelectionId - The Recharge bundle selection ID.
-   * @returns The API response for the deletion.
+   * @returns Nothing on success.
    */
-  delete(bundleSelectionId: number): Promise<unknown> {
+  delete(bundleSelectionId: number): Promise<undefined> {
     return this._delete(`${this.url}/${bundleSelectionId}`);
   }
 
@@ -71,8 +89,13 @@ class BundleSelectionResource extends RechargeResource {
    * @param query - Optional query string parameters for filtering and pagination.
    * @returns The list of bundle selection records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "bundle_selections", query);
+  list(query?: BundleSelectionListParams): Promise<BundleSelection[]> {
+    return this._paginate(
+      `${this.url}`,
+      "bundle_selections",
+      query as Record<string, string> | undefined,
+      BundleSelection
+    );
   }
 }
 

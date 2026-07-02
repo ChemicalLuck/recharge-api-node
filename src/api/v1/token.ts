@@ -1,5 +1,6 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import { TokenInformationResponse } from "~/models/api/v1/token";
 import RechargeResource from "../resource";
 
 /**
@@ -21,8 +22,8 @@ class TokenResource extends RechargeResource {
    *
    * @returns The token information record.
    */
-  token_information(): Promise<unknown> {
-    return this._get(this.url);
+  token_information(): Promise<TokenInformationResponse> {
+    return this._get(this.url, undefined, TokenInformationResponse);
   }
 }
 

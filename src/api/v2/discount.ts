@@ -1,5 +1,12 @@
 import type RechargeClient from "~/client";
 import { RechargeAPIVersion } from "~/models";
+import {
+  Discount,
+  DiscountResponse,
+  type DiscountListParams,
+  type DiscountCreateBody,
+  type DiscountUpdateBody
+} from "~/models/api/v2/discount";
 import RechargeResource from "../resource";
 
 /**
@@ -22,8 +29,8 @@ class DiscountResource extends RechargeResource {
    * @param body - The discount payload.
    * @returns The created discount record.
    */
-  create(body: object): Promise<unknown> {
-    return this._post(`${this.url}`, body);
+  create(body: DiscountCreateBody): Promise<DiscountResponse> {
+    return this._post(`${this.url}`, body, DiscountResponse);
   }
 
   /**
@@ -34,8 +41,8 @@ class DiscountResource extends RechargeResource {
    * @param discountId - The Recharge discount ID.
    * @returns The discount record.
    */
-  get(discountId: number): Promise<unknown> {
-    return this._get(`${this.url}/${discountId}`);
+  get(discountId: number): Promise<DiscountResponse> {
+    return this._get(`${this.url}/${discountId}`, undefined, DiscountResponse);
   }
 
   /**
@@ -47,8 +54,11 @@ class DiscountResource extends RechargeResource {
    * @param body - The fields to update.
    * @returns The updated discount record.
    */
-  update(discountId: number, body: object): Promise<unknown> {
-    return this._put(`${this.url}/${discountId}`, body);
+  update(
+    discountId: number,
+    body: DiscountUpdateBody
+  ): Promise<DiscountResponse> {
+    return this._put(`${this.url}/${discountId}`, body, DiscountResponse);
   }
 
   /**
@@ -59,7 +69,7 @@ class DiscountResource extends RechargeResource {
    * @param discountId - The Recharge discount ID.
    * @returns The API response for the deletion.
    */
-  delete(discountId: number): Promise<unknown> {
+  delete(discountId: number): Promise<undefined> {
     return this._delete(`${this.url}/${discountId}`);
   }
 
@@ -71,8 +81,13 @@ class DiscountResource extends RechargeResource {
    * @param query - Optional query string parameters for filtering and pagination.
    * @returns The list of discount records.
    */
-  list(query?: Record<string, string>): Promise<unknown> {
-    return this._paginate(`${this.url}`, "discounts", query);
+  list(query?: DiscountListParams): Promise<Discount[]> {
+    return this._paginate(
+      `${this.url}`,
+      "discounts",
+      query as Record<string, string> | undefined,
+      Discount
+    );
   }
 }
 
